@@ -1,0 +1,84 @@
+@{
+    ViewData["Title"] = "Service History";
+    ViewData["ActivePage"] = "History";
+    var services = ViewBag.Services as List<AutoCarePro.Models.Service> ?? new();
+    var serviceTypes = ViewBag.ServiceTypes as List<string> ?? new();
+    string selectedType = ViewBag.SelectedType ?? "All";
+    string search = ViewBag.Search ?? "";
+    int totalCount = ViewBag.TotalCount ?? 0;
+
+    var monthAbbr = new[] {"","JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"};
+}
+
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Service History</h1>
+        <p class="page-subtitle">Track all customer service records and transactions</p>
+    </div>
+</div>
+
+<div class="search-filter-bar">
+    <form method="get" asp-action="Index" id="history-filter-form">
+        <div class="search-filter-row">
+            <div class="search-box">
+                <span class="material-symbols-outlined search-icon">search</span>
+                <input type="text" name="search" value="@search" class="search-input"
+                       placeholder="Search by service, customer, vehicle..." id="history-search" />
+            </div>
+            <div class="filter-pills">
+                <a asp-action="Index" asp-route-search="@search" asp-route-serviceType="All"
+                   class="pill @(selectedType == "All" ? "active" : "")" id="pill-type-all">All</a>
+                @foreach (var t in serviceTypes)
+                {
+                    <a asp-action="Index" asp-route-search="@search" asp-route-serviceType="@t"
+                       class="pill @(selectedType == t ? "active" : "")" id="pill-type-@t.Replace(" ","-").ToLower()">@t</a>
+                }
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">Service Records</h2>
+        <span class="record-count">@totalCount records</span>
+    </div>
+    <div class="timeline">
+        @foreach (var s in services)
+        {
+            <div class="timeline-item" id="service-@s.Id">
+                <div class="timeline-date">
+                    <div class="timeline-month">@monthAbbr[s.Date.Month]</div>
+                    <div class="timeline-day">@s.Date.Day</div>
+                    <div class="timeline-year">@s.Date.Year</div>
+                </div>
+                <div class="timeline-body">
+                    <div class="timeline-header">
+                        <div class="timeline-title">
+                            <span class="timeline-service">@s.ServiceType</span>
+                            <span class="status-badge completed">@s.Status</span>
+                        </div>
+                        <div class="timeline-cost">₹@s.Cost.ToString("N0")</div>
+                    </div>
+                    @if (s.Vehicle != null)
+                    {
+                        <div class="timeline-customer">
+                            @s.Vehicle.Customer?.FullName — @s.Vehicle.Make @s.Vehicle.Model (@s.Vehicle.LicensePlate)
+                        </div>
+                    }
+                    @if (!string.IsNullOrEmpty(s.Description))
+                    {
+                        <div class="timeline-desc">@s.Description</div>
+                    }
+                </div>
+            </div>
+        }
+        @if (!services.Any())
+        {
+            <div class="empty-state center">
+                <span class="material-symbols-outlined empty-icon">history</span>
+                <p>No service records found.</p>
+            </div>
+        }
+    </div>
+</div>

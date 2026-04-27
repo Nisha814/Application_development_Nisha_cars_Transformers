@@ -1,0 +1,66 @@
+## .NET / ASP.NET Core
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.userprefs
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+*.nupkg
+*.snupkg
+project.lock.json
+artifacts/
+
+## Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+build/
+bld/
+out/
+msbuild.log
+msbuild.err
+msbuild.wrn
+
+## Visual Studio
+.vs/
+*.rsuser
+*.vsp
+*.vspx
+*.sap
+
+## VS Code
+.vscode/
+
+## Rider / JetBrains
+.idea/
+*.sln.iml
+
+## NuGet
+packages/
+*.nupkg
+!**/[Pp]ackages/build/
+
+## ASP.NET Scaffolding
+ScaffoldingReadMe.txt
+
+## SQLite DB files (optional - remove if you want to track the DB)
+*.db
+*.db-shm
+*.db-wal
+
+## dotnet publish output
+publish/
+wwwroot/lib/
+
+## User secrets
+secrets.json
+appsettings.Development.json
+
+## OS
+Thumbs.db
+.DS_Store
+desktop.ini

@@ -1,0 +1,134 @@
+@{
+    ViewData["Title"] = "Dashboard";
+    ViewData["ActivePage"] = "Dashboard";
+    var recentServices = ViewBag.RecentServices as List<AutoCarePro.Models.Service> ?? new();
+    var newCustomers = ViewBag.NewCustomers as List<AutoCarePro.Models.Customer> ?? new();
+    decimal totalRevenue = ViewBag.TotalRevenue ?? 0m;
+}
+
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Customer Dashboard</h1>
+        <p class="page-subtitle">Overview of your customer and vehicle management</p>
+    </div>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card stat-orange">
+        <div class="stat-icon"><span class="material-symbols-outlined">group</span></div>
+        <div class="stat-info">
+            <div class="stat-number">@ViewBag.TotalCustomers</div>
+            <div class="stat-label">Total Customers</div>
+        </div>
+    </div>
+    <div class="stat-card stat-teal">
+        <div class="stat-icon"><span class="material-symbols-outlined">directions_car</span></div>
+        <div class="stat-info">
+            <div class="stat-number">@ViewBag.TotalVehicles</div>
+            <div class="stat-label">Total Vehicles</div>
+        </div>
+    </div>
+    <div class="stat-card stat-blue">
+        <div class="stat-icon"><span class="material-symbols-outlined">schedule</span></div>
+        <div class="stat-info">
+            <div class="stat-number">@ViewBag.TotalServices</div>
+            <div class="stat-label">Services Done</div>
+        </div>
+    </div>
+    <div class="stat-card stat-red">
+        <div class="stat-icon"><span class="material-symbols-outlined">currency_rupee</span></div>
+        <div class="stat-info">
+            <div class="stat-number">₹@totalRevenue.ToString("N0")</div>
+            <div class="stat-label">Total Revenue</div>
+        </div>
+    </div>
+</div>
+
+<div class="dashboard-grid">
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">Recent Services</h2>
+            <a asp-controller="History" asp-action="Index" class="view-all">View All</a>
+        </div>
+        <div class="service-list">
+            @foreach (var service in recentServices)
+            {
+                <div class="service-item">
+                    <div class="service-info">
+                        <div class="service-type">@service.ServiceType</div>
+                        @if (service.Vehicle?.Customer != null)
+                        {
+                            <div class="service-meta">@service.Vehicle.Customer.FullName — @service.Vehicle.Make @service.Vehicle.Model</div>
+                        }
+                    </div>
+                    <div class="service-right">
+                        <div class="service-cost">₹@service.Cost.ToString("N0")</div>
+                        <div class="service-date">@service.Date.ToString("d/M/yyyy")</div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">New Customers</h2>
+            <a asp-controller="Records" asp-action="Index" class="view-all">View All</a>
+        </div>
+        <div class="customer-list">
+            @foreach (var customer in newCustomers)
+            {
+                <div class="customer-item">
+                    <div class="avatar" style="background:@GetAvatarColor(customer.FullName)">
+                        @GetInitials(customer.FullName)
+                    </div>
+                    <div class="customer-info">
+                        <div class="customer-name">@customer.FullName</div>
+                        <div class="customer-phone">@customer.Phone</div>
+                    </div>
+                    <div class="customer-right">
+                        <div class="vehicle-count">@customer.Vehicles.Count vehicle@(customer.Vehicles.Count != 1 ? "s" : "")</div>
+                        <div class="customer-date">@customer.RegisteredDate.ToString("d/M/yyyy")</div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<div class="quick-actions">
+    <a asp-controller="Registration" asp-action="Index" class="quick-card" id="qa-add-customer">
+        <span class="material-symbols-outlined quick-icon orange">person_add</span>
+        <div class="quick-title">Add Customer</div>
+        <div class="quick-sub">Register new customer</div>
+    </a>
+    <a asp-controller="Vehicle" asp-action="Index" class="quick-card" id="qa-add-vehicle">
+        <span class="material-symbols-outlined quick-icon teal">directions_car</span>
+        <div class="quick-title">Add Vehicle</div>
+        <div class="quick-sub">Register a vehicle</div>
+    </a>
+    <a asp-controller="History" asp-action="Index" class="quick-card" id="qa-service-log">
+        <span class="material-symbols-outlined quick-icon blue">history</span>
+        <div class="quick-title">Service Log</div>
+        <div class="quick-sub">View all services</div>
+    </a>
+    <a asp-controller="Records" asp-action="Index" class="quick-card" id="qa-all-records">
+        <span class="material-symbols-outlined quick-icon red">table_rows</span>
+        <div class="quick-title">All Records</div>
+        <div class="quick-sub">Browse customer data</div>
+    </a>
+</div>
+
+@functions {
+    string GetInitials(string name)
+    {
+        var parts = name.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length >= 2) return $"{parts[0][0]}{parts[1][0]}".ToUpper();
+        return parts[0].Length >= 2 ? parts[0][..2].ToUpper() : parts[0].ToUpper();
+    }
+    string GetAvatarColor(string name)
+    {
+        var colors = new[] { "#f59e0b", "#10b981", "#3b82f6", "#8b5cf6", "#ec4899", "#06b6d4", "#f97316", "#84cc16" };
+        return colors[Math.Abs(name.GetHashCode()) % colors.Length];
+    }
+}

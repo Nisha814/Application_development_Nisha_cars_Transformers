@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="AutoCare Pro - Customer and Vehicle Service Management System" />
+    <title>@ViewData["Title"] - AutoCare Pro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <nav class="navbar" id="main-navbar">
+        <div class="nav-brand">
+            <div class="brand-logo">
+                <span class="material-symbols-outlined">directions_car</span>
+            </div>
+            <span class="brand-name">AutoCare Pro</span>
+        </div>
+        <div class="nav-links">
+            <a asp-controller="Home" asp-action="Index" class="nav-link @(ViewData["ActivePage"]?.ToString() == "Dashboard" ? "active" : "")">
+                <span class="material-symbols-outlined">dashboard</span>
+                Dashboard
+            </a>
+            <a asp-controller="Registration" asp-action="Index" class="nav-link @(ViewData["ActivePage"]?.ToString() == "Registration" ? "active" : "")">
+                <span class="material-symbols-outlined">person_add</span>
+                Registration
+            </a>
+            <a asp-controller="Vehicle" asp-action="Index" class="nav-link @(ViewData["ActivePage"]?.ToString() == "Vehicle" ? "active" : "")">
+                <span class="material-symbols-outlined">directions_car</span>
+                Vehicle
+            </a>
+            <a asp-controller="History" asp-action="Index" class="nav-link @(ViewData["ActivePage"]?.ToString() == "History" ? "active" : "")">
+                <span class="material-symbols-outlined">history</span>
+                History
+            </a>
+            <a asp-controller="Records" asp-action="Index" class="nav-link @(ViewData["ActivePage"]?.ToString() == "Records" ? "active" : "")">
+                <span class="material-symbols-outlined">table_rows</span>
+                Records
+            </a>
+        </div>
+        <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation">
+            <span class="material-symbols-outlined">menu</span>
+        </button>
+    </nav>
+
+    <main class="main-content">
+        @if (TempData["Success"] != null)
+        {
+            <div class="toast-notification success" id="toast">
+                <span class="material-symbols-outlined">check_circle</span>
+                @TempData["Success"]
+            </div>
+        }
+        @RenderBody()
+    </main>
+
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

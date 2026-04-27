@@ -1,0 +1,102 @@
+@{
+    ViewData["Title"] = "Customer Records";
+    ViewData["ActivePage"] = "Records";
+    var customers = ViewBag.Customers as List<AutoCarePro.Models.Customer> ?? new();
+    string search = ViewBag.Search ?? "";
+    string sort = ViewBag.Sort ?? "newest";
+}
+
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Customer Records</h1>
+        <p class="page-subtitle">Complete database of all registered customers</p>
+    </div>
+    <a asp-action="Export" class="btn-primary" id="btn-export">
+        <span class="material-symbols-outlined">download</span>
+        Export
+    </a>
+</div>
+
+<div class="records-toolbar">
+    <form method="get" asp-action="Index" id="records-filter-form">
+        <div class="search-box wide">
+            <span class="material-symbols-outlined search-icon">search</span>
+            <input type="text" name="search" value="@search" class="search-input"
+                   placeholder="Search by name, email, or phone..." id="records-search" />
+            <input type="hidden" name="sort" value="@sort" id="sort-hidden" />
+        </div>
+        <div class="sort-pills">
+            <button type="button" class="sort-pill @(sort == "newest" ? "active" : "")"
+                    onclick="setSort('newest')" id="sort-newest">Newest First</button>
+            <button type="button" class="sort-pill @(sort == "name" ? "active" : "")"
+                    onclick="setSort('name')" id="sort-name">Name A-Z</button>
+            <button type="button" class="sort-pill @(sort == "vehicles" ? "active" : "")"
+                    onclick="setSort('vehicles')" id="sort-vehicles">Most Vehicles</button>
+        </div>
+    </form>
+</div>
+
+<div class="card">
+    <table class="records-table" id="records-table">
+        <thead>
+            <tr>
+                <th>CUSTOMER</th>
+                <th>CONTACT</th>
+                <th>ADDRESS</th>
+                <th class="text-center">VEHICLES</th>
+                <th class="text-center">SERVICES</th>
+                <th>REGISTERED</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var c in customers)
+            {
+                var vehicleCount = c.Vehicles.Count;
+                var serviceCount = c.Vehicles.Sum(v => v.Services.Count);
+                <tr id="record-@c.Id">
+                    <td>
+                        <div class="customer-cell">
+                            <div class="avatar sm" style="background:@GetAvatarColor(c.FullName)">@GetInitials(c.FullName)</div>
+                            <span class="customer-name-cell">@c.FullName</span>
+                        </div>
+                    </td>
+                    <td>
+                        <div>@c.Phone</div>
+                        <div class="email-cell">@c.Email</div>
+                    </td>
+                    <td class="address-cell" title="@c.Address">@(c.Address.Length > 30 ? c.Address[..27] + "..." : c.Address)</td>
+                    <td class="text-center"><span class="count-badge teal">@vehicleCount</span></td>
+                    <td class="text-center"><span class="count-badge blue">@serviceCount</span></td>
+                    <td>@c.RegisteredDate.ToString("d/M/yyyy")</td>
+                </tr>
+            }
+            @if (!customers.Any())
+            {
+                <tr><td colspan="6" class="empty-state center">No customers found.</td></tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+<script>
+function setSort(value) {
+    document.getElementById('sort-hidden').value = value;
+    document.getElementById('records-filter-form').submit();
+}
+</script>
+}
+
+@functions {
+    string GetInitials(string name)
+    {
+        var parts = name.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length >= 2) return $"{parts[0][0]}{parts[1][0]}".ToUpper();
+        return parts[0].Length >= 2 ? parts[0][..2].ToUpper() : parts[0].ToUpper();
+    }
+    string GetAvatarColor(string name)
+    {
+        var colors = new[] { "#f59e0b", "#10b981", "#3b82f6", "#8b5cf6", "#ec4899", "#06b6d4", "#f97316", "#84cc16" };
+        return colors[Math.Abs(name.GetHashCode()) % colors.Length];
+    }
+}

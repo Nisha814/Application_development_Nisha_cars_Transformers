@@ -1,0 +1,174 @@
+@{
+    ViewData["Title"] = "Customer Vehicles";
+    ViewData["ActivePage"] = "Vehicle";
+    var vehicles = ViewBag.Vehicles as List<AutoCarePro.Models.Vehicle> ?? new();
+    var makes = ViewBag.Makes as List<string> ?? new();
+    var customers = ViewBag.Customers as List<AutoCarePro.Models.Customer> ?? new();
+    string selectedMake = ViewBag.SelectedMake ?? "All";
+    string search = ViewBag.Search ?? "";
+
+    var fuelColors = new Dictionary<string, string> {
+        {"Petrol","#f59e0b"}, {"Diesel","#374151"}, {"Electric","#10b981"}, {"CNG","#3b82f6"}
+    };
+    var colorDotMap = new Dictionary<string, string> {
+        {"Pearl White","#f3f4f6"},{"Phantom Black","#111827"},{"Calgary White","#e5e7eb"},
+        {"Midnight Blue","#1e3a8a"},{"Oberon Black","#1f2937"},{"Golden Brown","#b45309"},
+        {"Super White","#f9fafb"},{"Intelligence Blue","#1d4ed8"},{"Nexa Blue","#2563eb"},
+        {"Fiery Red","#dc2626"},{"Pearl Silver","#9ca3af"}
+    };
+
+    string GetVehicleImage(string color) {
+        var c = color.ToLower();
+        if (c.Contains("white") || c.Contains("silver") || c.Contains("calgary")) return "/images/vehicles/white_sedan.png";
+        if (c.Contains("black") || c.Contains("oberon") || c.Contains("phantom")) return "/images/vehicles/black_suv.png";
+        if (c.Contains("blue") || c.Contains("midnight") || c.Contains("nexa") || c.Contains("intelligence")) return "/images/vehicles/blue_suv.png";
+        if (c.Contains("red") || c.Contains("fiery")) return "/images/vehicles/red_sedan.png";
+        if (c.Contains("brown") || c.Contains("golden")) return "/images/vehicles/brown_sedan.png";
+        return "/images/vehicles/silver_hatchback.png";
+    }
+}
+
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Customer Vehicles</h1>
+        <p class="page-subtitle">Manage and view all registered vehicles</p>
+    </div>
+    <button class="btn-primary" id="btn-open-modal" onclick="openModal()">
+        <span class="material-symbols-outlined">add</span>
+        Add Vehicle
+    </button>
+</div>
+
+<div class="search-filter-bar">
+    <form method="get" asp-action="Index" class="search-filter-form" id="vehicle-filter-form">
+        <div class="search-box">
+            <span class="material-symbols-outlined search-icon">search</span>
+            <input type="text" name="search" value="@search" class="search-input" placeholder="Search by make, model, or plate..." id="vehicle-search" />
+        </div>
+        <div class="filter-pills">
+            <a asp-action="Index" asp-route-search="@search" asp-route-make="All"
+               class="pill @(selectedMake == "All" ? "active" : "")" id="pill-all">All</a>
+            @foreach (var m in makes)
+            {
+                <a asp-action="Index" asp-route-search="@search" asp-route-make="@m"
+                   class="pill @(selectedMake == m ? "active" : "")" id="pill-@m.Replace(" ","-").ToLower()">@m</a>
+            }
+        </div>
+    </form>
+</div>
+
+<div class="vehicle-grid">
+    @foreach (var v in vehicles)
+    {
+        var fuelColor = fuelColors.ContainsKey(v.FuelType) ? fuelColors[v.FuelType] : "#6b7280";
+        var dotColor = colorDotMap.ContainsKey(v.Color) ? colorDotMap[v.Color] : "#6b7280";
+        <div class="vehicle-card" id="vehicle-@v.Id">
+            <div class="vehicle-card-top">
+                <div class="fuel-badge" style="background:@fuelColor">@v.FuelType</div>
+                <div class="vehicle-year">@v.Year</div>
+                <div class="vehicle-image-wrap">
+                    <img src="@GetVehicleImage(v.Color)" alt="@v.Make @v.Model" class="vehicle-img" />
+                </div>
+            </div>
+            <div class="vehicle-card-body">
+                <div class="vehicle-name">@v.Make @v.Model</div>
+                <div class="vehicle-plate">@v.LicensePlate</div>
+                <div class="vehicle-details">
+                    <div class="vehicle-detail-row">
+                        <span class="material-symbols-outlined detail-icon">person</span>
+                        <span class="detail-label">Owner</span>
+                        <span class="detail-value">@(v.Customer?.FullName ?? "—")</span>
+                    </div>
+                    <div class="vehicle-detail-row">
+                        <span class="material-symbols-outlined detail-icon">palette</span>
+                        <span class="detail-label">Color</span>
+                        <span class="detail-value">@v.Color <span class="color-dot" style="background:@dotColor"></span></span>
+                    </div>
+                    <div class="vehicle-detail-row">
+                        <span class="material-symbols-outlined detail-icon">confirmation_number</span>
+                        <span class="detail-label">VIN</span>
+                        <span class="detail-value vin">@v.VIN</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    @if (!vehicles.Any())
+    {
+        <div class="empty-grid">
+            <span class="material-symbols-outlined empty-icon">directions_car</span>
+            <p>No vehicles found.</p>
+        </div>
+    }
+</div>
+
+<!-- Add Vehicle Modal -->
+<div class="modal-overlay" id="vehicle-modal" onclick="closeModalOnOverlay(event)">
+    <div class="modal">
+        <div class="modal-header">
+            <h2 class="modal-title">Add New Vehicle</h2>
+            <button class="modal-close" onclick="closeModal()" id="btn-close-modal">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+        <form asp-controller="Vehicle" asp-action="Add" method="post" id="add-vehicle-form">
+            @Html.AntiForgeryToken()
+            <div class="form-group">
+                <label class="form-label">Customer</label>
+                <select name="CustomerId" class="form-control" id="select-customer" required>
+                    <option value="">— Select Customer —</option>
+                    @foreach (var c in customers)
+                    {
+                        <option value="@c.Id">@c.FullName</option>
+                    }
+                </select>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Make</label>
+                    <input type="text" name="Make" class="form-control" placeholder="e.g. Hyundai" id="input-make" required />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Model</label>
+                    <input type="text" name="Model" class="form-control" placeholder="e.g. Creta" id="input-model" required />
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">License Plate</label>
+                    <input type="text" name="LicensePlate" class="form-control" placeholder="e.g. KA-01-AB-1234" id="input-plate" required />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Year</label>
+                    <input type="number" name="Year" class="form-control" min="1990" max="2030" value="@DateTime.Now.Year" id="input-year" required />
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Fuel Type</label>
+                    <select name="FuelType" class="form-control" id="select-fuel">
+                        <option>Petrol</option>
+                        <option>Diesel</option>
+                        <option>Electric</option>
+                        <option>CNG</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Color</label>
+                    <input type="text" name="Color" class="form-control" placeholder="e.g. Pearl White" id="input-color" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">VIN</label>
+                <input type="text" name="VIN" class="form-control" placeholder="Vehicle Identification Number" id="input-vin" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" onclick="closeModal()">Cancel</button>
+                <button type="submit" class="btn-primary" id="btn-save-vehicle">
+                    <span class="material-symbols-outlined">save</span>
+                    Save Vehicle
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
