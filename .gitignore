@@ -1,0 +1,20 @@
+# ===== .NET API =====
+VehicleParts.API/bin/
+VehicleParts.API/obj/
+VehicleParts.API/.vs/
+VehicleParts.API/*.user
+
+# ===== React Frontend =====
+VehicleParts.Frontend/node_modules/
+VehicleParts.Frontend/dist/
+VehicleParts.Frontend/.env
+VehicleParts.Frontend/.env.local
+
+# ===== OS Files =====
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# ===== Logs =====
+*.log
+npm-debug.log*
