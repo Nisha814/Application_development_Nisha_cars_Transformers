@@ -2,7 +2,8 @@
 bin/
 obj/
 
-## User-specific files
+## Secrets - NEVER commit this file
+appsettings.Development.json
 *.user
 *.suo
 .vs/
