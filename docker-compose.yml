@@ -1,0 +1,34 @@
+version: '3.9'
+
+services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: VehiclePartsDb
+      POSTGRES_USER: vehicleparts
+      POSTGRES_PASSWORD: vehicleparts_pw
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - db
+    ports:
+      - "5000:80"
+    environment:
+      ConnectionStrings__DefaultConnection: "Host=db;Database=VehiclePartsDb;Username=vehicleparts;Password=vehicleparts_pw"
+      Jwt__Key: "REPLACE_WITH_YOUR_SECRET_KEY_MIN_32_CHARS"
+      Jwt__Issuer: "VehiclePartsAPI"
+      Jwt__Audience: "VehiclePartsUsers"
+      ASPNETCORE_ENVIRONMENT: "Development"
+    volumes:
+      - ./wwwroot:/app/wwwroot
+
+volumes:
+  pgdata:

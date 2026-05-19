@@ -1,0 +1,20 @@
+## .NET Build Output
+bin/
+obj/
+
+## Secrets - NEVER commit this file
+appsettings.Development.json
+*.user
+*.suo
+.vs/
+
+## Logs
+*.log
+
+## App Settings with secrets (do not push passwords!)
+appsettings.Development.json
+
+## Entity Framework
+*.db
+*.db-shm
+*.db-wal

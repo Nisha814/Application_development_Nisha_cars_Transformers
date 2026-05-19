@@ -1,0 +1,15 @@
+bin/
+obj/
+*.user
+*.suo
+*.vs/
+.vscode/
+.nuget/
+*.log
+**/bin/
+**/obj/
+**/*.db
+**/*.sql
+**/*.pdb
+**/*.ZIP
+**/*.zip
