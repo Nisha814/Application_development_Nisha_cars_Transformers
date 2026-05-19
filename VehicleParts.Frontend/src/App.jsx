@@ -9,6 +9,9 @@ import StaffManagement from './pages/StaffManagement';
 import VendorManagement from './pages/VendorManagement';
 import Profile from './pages/Profile';
 import CustomerManagement from './pages/CustomerManagement';
+import PartsManagement from './pages/PartsManagement';
+import InvoicesManagement from './pages/InvoicesManagement';
+import FinancialReports from './pages/FinancialReports';
 import { Toaster } from 'react-hot-toast';
 import Unauthorized from './pages/Unauthorized';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -53,6 +56,30 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={['Admin']}>
               <VendorManagement />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/admin/parts" 
+          element={
+            <ProtectedRoute allowedRoles={['Admin', 'Staff']}>
+              <PartsManagement />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/admin/invoices" 
+          element={
+            <ProtectedRoute allowedRoles={['Admin', 'Staff']}>
+              <InvoicesManagement />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/admin/reports" 
+          element={
+            <ProtectedRoute allowedRoles={['Admin']}>
+              <FinancialReports />
             </ProtectedRoute>
           } 
         />

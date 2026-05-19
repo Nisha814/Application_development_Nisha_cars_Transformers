@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getDashboardOverview } from '../services/api';
+import { getDashboardOverview, getParts } from '../services/api';
 import DashboardLayout from '../components/DashboardLayout';
 
 const AdminDashboard = () => {
@@ -12,17 +12,26 @@ const AdminDashboard = () => {
         activeUsers: 0,
         systemStatus: 'Operational'
     });
+    const [lowStockParts, setLowStockParts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
 
-    const fullName = localStorage.getItem('fullName') || 'Admin';
+    const fullName = sessionStorage.getItem('fullName') || 'Admin';
 
     useEffect(() => {
-        const fetchStats = async () => {
+        const fetchDashboardData = async () => {
             try {
-                const response = await getDashboardOverview();
-                setStats(response.data);
+                const [statsRes, partsRes] = await Promise.all([
+                    getDashboardOverview(),
+                    getParts()
+                ]);
+                setStats(statsRes.data);
+                
+                // Automatically filter low stock parts (< 10 units)
+                const lowStock = partsRes.data.filter(p => p.stockQuantity < 10);
+                setLowStockParts(lowStock);
+                
                 setLoading(false);
             } catch (err) {
                 if (err.response?.status === 401 || err.response?.status === 403) {
@@ -34,10 +43,10 @@ const AdminDashboard = () => {
             }
         };
 
-        fetchStats();
+        fetchDashboardData();
     }, [navigate]);
 
-    if (loading) return <div style={{ padding: '40px' }}><h2>Loading dashboard...</h2></div>;
+    if (loading) return <DashboardLayout><div style={{ padding: '40px' }}><h2>Loading dashboard data...</h2></div></DashboardLayout>;
 
     return (
         <DashboardLayout>
@@ -54,6 +63,43 @@ const AdminDashboard = () => {
             </header>
 
             {error && <div className="message error">{error}</div>}
+
+            {/* System Low Stock Automated Notifications (< 10 units) */}
+            {lowStockParts.length > 0 && (
+                <div style={{ 
+                    background: '#fffbeb', 
+                    border: '1px solid #fef3c7', 
+                    borderRadius: '16px', 
+                    padding: '20px', 
+                    marginBottom: '32px',
+                    boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)'
+                }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+                        <span style={{ fontSize: '20px' }}>⚠️</span>
+                        <h3 style={{ fontSize: '15px', fontWeight: '700', color: '#b45309', margin: 0 }}>
+                            Automated Low Stock Notifications ({"<"} 10 units left)
+                        </h3>
+                    </div>
+                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                        {lowStockParts.map(part => (
+                            <div 
+                                key={part.id} 
+                                style={{ 
+                                    background: 'white', 
+                                    border: '1px solid #fde68a', 
+                                    padding: '8px 14px', 
+                                    borderRadius: '8px', 
+                                    fontSize: '12px', 
+                                    fontWeight: '600', 
+                                    color: '#78350f' 
+                                }}
+                            >
+                                📦 {part.partName} (SKU: {part.sku}) - <strong style={{ color: '#ef4444' }}>{part.stockQuantity} remaining</strong>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
 
             {/* Stats Grid */}
             <div className="modern-stats-grid">

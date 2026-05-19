@@ -24,6 +24,7 @@ const StaffManagement = () => {
         role: 1 
     });
 
+    const [showPassword, setShowPassword] = useState(false);
     const [strength, setStrength] = useState(0);
     const [checks, setChecks] = useState({
         length: false,
@@ -32,6 +33,8 @@ const StaffManagement = () => {
         number: false,
         special: false
     });
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [deleteId, setDeleteId] = useState(null);
 
     useEffect(() => {
         fetchStaff();
@@ -87,6 +90,7 @@ const StaffManagement = () => {
     const handleAddClick = () => {
         setFormData({ fullName: '', email: '', phoneNumber: '', password: '', role: 1 });
         setIsEditing(false);
+        setShowPassword(false);
         setShowModal(true);
     };
 
@@ -100,17 +104,8 @@ const StaffManagement = () => {
         });
         setCurrentId(staff.id);
         setIsEditing(true);
+        setShowPassword(false);
         setShowModal(true);
-    };
-
-    const handleStatusToggle = async (id) => {
-        try {
-            const response = await toggleUserStatus(id);
-            toast.success(response.message);
-            fetchStaff();
-        } catch (error) {
-            toast.error("Failed to update status");
-        }
     };
 
     const handleSubmit = async (e) => {
@@ -147,11 +142,18 @@ const StaffManagement = () => {
         }
     };
 
-    const handleDelete = async (id) => {
-        if (!window.confirm("Are you sure you want to delete this staff member?")) return;
+    const handleDeleteClick = (id) => {
+        setDeleteId(id);
+        setShowDeleteModal(true);
+    };
+
+    const confirmDelete = async () => {
+        if (!deleteId) return;
         try {
-            await deleteStaff(id);
-            toast.success("Staff member deleted");
+            await deleteStaff(deleteId);
+            toast.success("Staff member deleted successfully!");
+            setShowDeleteModal(false);
+            setDeleteId(null);
             fetchStaff();
         } catch (error) {
             toast.error("Failed to delete staff member");
@@ -200,36 +202,21 @@ const StaffManagement = () => {
                                 <td style={{ padding: '16px' }}>{staff.fullName}</td>
                                 <td style={{ padding: '16px' }}>{staff.email}</td>
                                 <td style={{ padding: '16px' }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                        <span className={`status-badge ${staff.isActive ? 'status-admin' : 'status-customer'}`} style={{ 
-                                            background: staff.isActive ? '#dcfce7' : '#fee2e2',
-                                            color: staff.isActive ? '#166534' : '#991b1b',
-                                            padding: '4px 12px',
-                                            borderRadius: '20px',
-                                            fontSize: '12px',
-                                            fontWeight: '600'
-                                        }}>
-                                            {staff.isActive ? 'Active' : 'Deactivated'}
-                                        </span>
-                                        <button 
-                                            onClick={() => handleStatusToggle(staff.id)}
-                                            style={{ 
-                                                background: 'none', 
-                                                border: 'none', 
-                                                cursor: 'pointer', 
-                                                fontSize: '18px',
-                                                color: staff.isActive ? '#ef4444' : '#22c55e',
-                                                padding: '4px'
-                                            }}
-                                            title={staff.isActive ? "Deactivate User" : "Activate User"}
-                                        >
-                                            {staff.isActive ? '🔒' : '🔓'}
-                                        </button>
-                                    </div>
+                                    <span className={`status-badge ${staff.isActive ? 'status-admin' : 'status-customer'}`} style={{ 
+                                        background: staff.isActive ? '#dcfce7' : '#fee2e2',
+                                        color: staff.isActive ? '#166534' : '#991b1b',
+                                        padding: '4px 12px',
+                                        borderRadius: '20px',
+                                        fontSize: '12px',
+                                        fontWeight: '600',
+                                        display: 'inline-block'
+                                    }}>
+                                        {staff.isActive ? '🟢 Active' : '🔴 Offline'}
+                                    </span>
                                 </td>
                                 <td style={{ padding: '16px', textAlign: 'right' }}>
                                     <button onClick={() => handleEditClick(staff)} style={{ background: 'transparent', color: 'var(--primary)', border: 'none', marginRight: '12px', cursor: 'pointer', fontWeight: '600' }}>Edit</button>
-                                    <button onClick={() => handleDelete(staff.id)} style={{ background: 'transparent', color: '#ef4444', border: 'none', cursor: 'pointer', fontWeight: '600' }}>Delete</button>
+                                    <button onClick={() => handleDeleteClick(staff.id)} style={{ background: 'transparent', color: '#ef4444', border: 'none', cursor: 'pointer', fontWeight: '600' }}>Delete</button>
                                 </td>
                             </tr>
                         ))}
@@ -272,7 +259,46 @@ const StaffManagement = () => {
                                 <>
                                     <div className="form-group" style={{ marginBottom: '10px' }}>
                                         <label>Password</label>
-                                        <input type="password" name="password" value={formData.password} onChange={handleInputChange} required />
+                                        <div className="cyber-input-wrapper" style={{ position: 'relative' }}>
+                                            <input 
+                                                type={showPassword ? "text" : "password"} 
+                                                name="password" 
+                                                value={formData.password} 
+                                                onChange={handleInputChange} 
+                                                required 
+                                                style={{ paddingRight: '48px' }}
+                                            />
+                                            <button
+                                                type="button"
+                                                className="password-toggle-eye"
+                                                onClick={() => setShowPassword(!showPassword)}
+                                                style={{
+                                                    position: 'absolute',
+                                                    right: '12px',
+                                                    top: '50%',
+                                                    transform: 'translateY(-50%)',
+                                                    background: 'none',
+                                                    border: 'none',
+                                                    cursor: 'pointer',
+                                                    padding: '4px',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    color: 'var(--text-muted)'
+                                                }}
+                                            >
+                                                {showPassword ? (
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={{ width: '20px', height: '20px' }}>
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+                                                    </svg>
+                                                ) : (
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={{ width: '20px', height: '20px' }}>
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.644C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                    </svg>
+                                                )}
+                                            </button>
+                                        </div>
                                     </div>
                                     <div className="password-meter" style={{ marginBottom: '20px' }}>
                                         <div style={{ display: 'flex', gap: '4px', marginBottom: '8px' }}>
@@ -310,6 +336,57 @@ const StaffManagement = () => {
                                 Cancel
                             </button>
                         </form>
+                    </div>
+                </div>
+            )}
+
+            {showDeleteModal && (
+                <div className="modal-overlay">
+                    <div className="auth-card" style={{ width: '100%', maxWidth: '400px', textAlign: 'center', padding: '30px' }}>
+                        <div style={{ fontSize: '50px', marginBottom: '16px' }}>⚠️</div>
+                        <h2 style={{ fontSize: '20px', fontWeight: '700', marginBottom: '10px' }}>Confirm Deletion</h2>
+                        <p style={{ color: 'var(--text-muted)', fontSize: '14px', marginBottom: '24px' }}>
+                            Are you sure you want to delete this staff member? This action cannot be undone.
+                        </p>
+                        <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+                            <button 
+                                type="button"
+                                onClick={() => {
+                                    setShowDeleteModal(false);
+                                    setDeleteId(null);
+                                }} 
+                                className="auth-button" 
+                                style={{ 
+                                    background: '#e2e8f0', 
+                                    color: '#475569', 
+                                    width: 'auto', 
+                                    padding: '10px 24px',
+                                    borderRadius: '10px',
+                                    fontWeight: '600',
+                                    border: 'none',
+                                    cursor: 'pointer'
+                                }}
+                            >
+                                Cancel
+                            </button>
+                            <button 
+                                type="button"
+                                onClick={confirmDelete} 
+                                className="auth-button" 
+                                style={{ 
+                                    background: '#ef4444', 
+                                    color: 'white', 
+                                    width: 'auto', 
+                                    padding: '10px 24px',
+                                    borderRadius: '10px',
+                                    fontWeight: '600',
+                                    border: 'none',
+                                    cursor: 'pointer'
+                                }}
+                            >
+                                Delete
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}

@@ -10,14 +10,46 @@ const PhoneInputComponent = PhoneInput.default || PhoneInput;
 
 const Profile = () => {
     const [user, setUser] = useState({
-        fullName: localStorage.getItem('fullName') || '',
-        email: localStorage.getItem('email') || '',
-        role: localStorage.getItem('role') || '',
-        phoneNumber: localStorage.getItem('phoneNumber') || '',
-        profilePictureUrl: localStorage.getItem('profilePictureUrl') || null
+        fullName: sessionStorage.getItem('fullName') || '',
+        email: sessionStorage.getItem('email') || '',
+        role: sessionStorage.getItem('role') || '',
+        phoneNumber: sessionStorage.getItem('phoneNumber') || '',
+        profilePictureUrl: sessionStorage.getItem('profilePictureUrl') || null,
+        password: ''
     });
     const [loading, setLoading] = useState(false);
     const fileInputRef = useRef(null);
+
+    const [showPassword, setShowPassword] = useState(false);
+    const [strength, setStrength] = useState(0);
+    const [checks, setChecks] = useState({
+        length: false,
+        lower: false,
+        upper: false,
+        number: false,
+        special: false
+    });
+
+    useEffect(() => {
+        const pass = user.password || '';
+        const newChecks = {
+            length: pass.length >= 6,
+            lower: /[a-z]/.test(pass),
+            upper: /[A-Z]/.test(pass),
+            number: /[0-9]/.test(pass),
+            special: /[^A-Za-z0-9]/.test(pass)
+        };
+        setChecks(newChecks);
+        const activeChecks = Object.values(newChecks).filter(Boolean).length;
+        setStrength(activeChecks);
+    }, [user.password]);
+
+    const getStrengthLevel = () => {
+        if (strength === 0) return 'Empty';
+        if (strength <= 2) return 'Weak';
+        if (strength <= 4) return 'Medium';
+        return 'Strong';
+    };
 
     const handleChange = (e) => {
         setUser({ ...user, [e.target.name]: e.target.value });
@@ -43,7 +75,7 @@ const Profile = () => {
             });
 
             setUser(prev => ({ ...prev, profilePictureUrl: imageUrl }));
-            localStorage.setItem('profilePictureUrl', imageUrl);
+            sessionStorage.setItem('profilePictureUrl', imageUrl);
             toast.success("Profile picture updated!", { id: loadingToast });
         } catch (error) {
             toast.error("Upload failed: " + (error.message || "Unknown error"), { id: loadingToast });
@@ -62,17 +94,25 @@ const Profile = () => {
             }
         }
 
+        // Password validation if entered
+        if (user.password && strength < 5) {
+            toast.error("New password must meet all security requirements!");
+            return;
+        }
+
         setLoading(true);
         try {
             const response = await updateProfile({
                 fullName: user.fullName,
                 phoneNumber: user.phoneNumber,
-                profilePictureUrl: user.profilePictureUrl
+                profilePictureUrl: user.profilePictureUrl,
+                password: user.password || null
             });
             
-            localStorage.setItem('fullName', response.data.fullName);
-            localStorage.setItem('phoneNumber', response.data.phoneNumber || '');
+            sessionStorage.setItem('fullName', response.data.fullName);
+            sessionStorage.setItem('phoneNumber', response.data.phoneNumber || '');
             
+            setUser(prev => ({ ...prev, password: '' }));
             toast.success("Profile updated successfully");
         } catch (error) {
             toast.error(error.message || "Failed to update profile");
@@ -138,10 +178,80 @@ const Profile = () => {
                             buttonStyle={{ borderRadius: '12px 0 0 12px', background: 'white', border: '1px solid #e2e8f0' }}
                         />
                     </div>
-                    <div className="form-group">
-                        <label>User Role (Read-only)</label>
-                        <input type="text" value={user.role} disabled style={{ background: '#f1f5f9', cursor: 'not-allowed' }} />
+                    <div className="form-group" style={{ marginBottom: '10px' }}>
+                        <label>Change Password (Leave blank to keep current)</label>
+                        <div className="cyber-input-wrapper" style={{ position: 'relative' }}>
+                            <input 
+                                type={showPassword ? "text" : "password"} 
+                                name="password" 
+                                value={user.password} 
+                                onChange={handleChange} 
+                                style={{ paddingRight: '48px' }}
+                                placeholder="Enter new password"
+                            />
+                            <button
+                                type="button"
+                                className="password-toggle-eye"
+                                onClick={() => setShowPassword(!showPassword)}
+                                style={{
+                                    position: 'absolute',
+                                    right: '12px',
+                                    top: '50%',
+                                    transform: 'translateY(-50%)',
+                                    background: 'none',
+                                    border: 'none',
+                                    cursor: 'pointer',
+                                    padding: '4px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    color: 'var(--text-muted)'
+                                }}
+                            >
+                                {showPassword ? (
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={{ width: '20px', height: '20px' }}>
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+                                    </svg>
+                                ) : (
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={{ width: '20px', height: '20px' }}>
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.644C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
+                                )}
+                            </button>
+                        </div>
                     </div>
+
+                    {user.password && (
+                        <div className="password-meter" style={{ marginBottom: '20px' }}>
+                            <div style={{ display: 'flex', gap: '4px', marginBottom: '8px' }}>
+                                {[1, 2, 3, 4, 5].map((i) => (
+                                    <div 
+                                        key={i} 
+                                        style={{ 
+                                            height: '6px', 
+                                            flex: 1, 
+                                            borderRadius: '10px', 
+                                            background: i <= strength ? (strength <= 2 ? '#ef4444' : strength <= 4 ? '#3b82f6' : '#22c55e') : '#e2e8f0',
+                                            transition: 'all 0.3s ease'
+                                        }} 
+                                    />
+                                ))}
+                            </div>
+                            <p style={{ fontSize: '13px', margin: '0 0 12px 0' }}>Level: <strong>{getStrengthLevel()}</strong></p>
+                            <div className="password-checklist" style={{ fontSize: '13px', color: '#64748b' }}>
+                                <p style={{ fontWeight: '600', color: '#1e293b', marginBottom: '8px' }}>Password must contain:</p>
+                                <div style={{ display: 'grid', gap: '6px' }}>
+                                    <CheckItem label="Minimum number of characters is 6" active={checks.length} />
+                                    <CheckItem label="Should contain lowercase" active={checks.lower} />
+                                    <CheckItem label="Should contain uppercase" active={checks.upper} />
+                                    <CheckItem label="Should contain numbers" active={checks.number} />
+                                    <CheckItem label="Should contain special characters" active={checks.special} />
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
                     <button type="submit" className="auth-button" style={{ marginTop: '10px' }} disabled={loading}>
                         {loading ? 'Updating...' : 'Update Profile Information'}
                     </button>
@@ -152,3 +262,10 @@ const Profile = () => {
 };
 
 export default Profile;
+
+const CheckItem = ({ label, active }) => (
+    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: active ? '#22c55e' : '#94a3b8' }}>
+        <span style={{ fontSize: '14px' }}>{active ? '✓' : '✕'}</span>
+        <span>{label}</span>
+    </div>
+);

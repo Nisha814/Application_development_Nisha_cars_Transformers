@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { logoutUser } from '../services/api';
 
 const API_BASE_URL = 'http://localhost:5026';
 
@@ -7,20 +8,31 @@ const DashboardLayout = ({ children }) => {
     const navigate = useNavigate();
     const location = useLocation();
     
-    const fullName = localStorage.getItem('fullName') || 'Admin';
-    const email = localStorage.getItem('email') || 'admin@vehicleparts.com';
-    const profilePictureUrl = localStorage.getItem('profilePictureUrl');
+    const fullName = sessionStorage.getItem('fullName') || 'Admin';
+    const email = sessionStorage.getItem('email') || 'admin@vehicleparts.com';
+    const profilePictureUrl = sessionStorage.getItem('profilePictureUrl');
+    const role = sessionStorage.getItem('role') || 'Admin';
 
-    const handleLogout = () => {
-        localStorage.clear();
+    const handleLogout = async () => {
+        try {
+            await logoutUser();
+        } catch (e) {
+            console.error("Logout API failed", e);
+        }
+        sessionStorage.clear();
         navigate('/login');
     };
 
     const navItems = [
-        { name: 'Dashboard', path: '/admin-dashboard', icon: '📊' },
-        { name: 'Staff', path: '/admin/staff', icon: '👥' },
-        { name: 'Customers', path: '/admin/customers', icon: '🤝' },
-        { name: 'Vendors', path: '/admin/vendors', icon: '🏢' },
+        { name: 'Dashboard', path: role === 'Admin' ? '/admin-dashboard' : role === 'Staff' ? '/staff-dashboard' : '/customer-dashboard', icon: '📊' },
+        { name: 'Parts Inventory', path: '/admin/parts', icon: '⚙️' },
+        { name: 'Purchase Invoices', path: '/admin/invoices', icon: '🧾' },
+        ...(role === 'Admin' ? [
+            { name: 'Staff', path: '/admin/staff', icon: '👥' },
+            { name: 'Customers', path: '/admin/customers', icon: '🤝' },
+            { name: 'Vendors', path: '/admin/vendors', icon: '🏢' },
+            { name: 'Financial Reports', path: '/admin/reports', icon: '📊' }
+        ] : []),
         { name: 'Profile', path: '/profile', icon: '👤' },
     ];
 

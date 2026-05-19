@@ -18,3 +18,10 @@ Desktop.ini
 # ===== Logs =====
 *.log
 npm-debug.log*
+
+# ===== Test Scripts & Temp =====
+VehicleParts.API/*.js
+VehicleParts.API/node_modules/
+VehicleParts.API/package.json
+VehicleParts.API/package-lock.json
+VehicleParts.API/query

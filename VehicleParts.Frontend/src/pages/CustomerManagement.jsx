@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getStaff, toggleUserStatus } from '../services/api';
+import { getCustomers, toggleUserStatus } from '../services/api';
 import DashboardLayout from '../components/DashboardLayout';
 import toast from 'react-hot-toast';
 
@@ -14,11 +14,8 @@ const CustomerManagement = () => {
 
     const fetchCustomers = async () => {
         try {
-            // We use the same getStaff endpoint but filter for Customers on the frontend
-            // In a larger app, you'd have a dedicated /api/customers endpoint
-            const response = await getStaff();
-            const customers = response.data.filter(u => u.role === 'Customer');
-            setCustomerList(customers);
+            const response = await getCustomers();
+            setCustomerList(response.data);
             setLoading(false);
         } catch (error) {
             toast.error("Failed to load customer data");
@@ -30,16 +27,6 @@ const CustomerManagement = () => {
         (customer.fullName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
         (customer.email || '').toLowerCase().includes(searchTerm.toLowerCase())
     );
-
-    const handleStatusToggle = async (id) => {
-        try {
-            const response = await toggleUserStatus(id);
-            toast.success(response.message);
-            fetchCustomers();
-        } catch (error) {
-            toast.error("Failed to update status");
-        }
-    };
 
     if (loading) return <DashboardLayout><div style={{ padding: '40px' }}><h2>Loading Customers...</h2></div></DashboardLayout>;
 
@@ -87,36 +74,17 @@ const CustomerManagement = () => {
                                     </span>
                                 </td>
                                 <td style={{ padding: '16px' }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                        <span style={{ 
-                                            background: customer.isActive ? '#dcfce7' : '#fee2e2',
-                                            color: customer.isActive ? '#166534' : '#991b1b',
-                                            padding: '4px 12px',
-                                            borderRadius: '20px',
-                                            fontSize: '12px',
-                                            fontWeight: '600',
-                                            minWidth: '90px',
-                                            textAlign: 'center'
-                                        }}>
-                                            {customer.isActive ? 'ACTIVE' : 'SUSPENDED'}
-                                        </span>
-                                        <button 
-                                            onClick={() => handleStatusToggle(customer.id)}
-                                            style={{ 
-                                                background: 'none', 
-                                                border: 'none', 
-                                                cursor: 'pointer', 
-                                                fontSize: '18px',
-                                                padding: '4px',
-                                                transition: 'transform 0.2s'
-                                            }}
-                                            onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.2)'}
-                                            onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
-                                            title={customer.isActive ? "Deactivate Customer" : "Activate Customer"}
-                                        >
-                                            {customer.isActive ? '🔴' : '🟢'}
-                                        </button>
-                                    </div>
+                                    <span style={{ 
+                                        background: customer.isActive ? '#dcfce7' : '#fee2e2',
+                                        color: customer.isActive ? '#166534' : '#991b1b',
+                                        padding: '4px 12px',
+                                        borderRadius: '20px',
+                                        fontSize: '12px',
+                                        fontWeight: '600',
+                                        display: 'inline-block'
+                                    }}>
+                                        {customer.isActive ? '🟢 Active' : '🔴 Offline'}
+                                    </span>
                                 </td>
                             </tr>
                         )) : (

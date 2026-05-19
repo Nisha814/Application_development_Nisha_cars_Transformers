@@ -1,11 +1,17 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { logoutUser } from '../services/api';
 
 const CustomerDashboard = () => {
     const navigate = useNavigate();
 
-    const handleLogout = () => {
-        localStorage.clear();
+    const handleLogout = async () => {
+        try {
+            await logoutUser();
+        } catch (e) {
+            console.error("Logout API failed", e);
+        }
+        sessionStorage.clear();
         navigate('/login');
     };
 

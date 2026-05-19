@@ -50,6 +50,11 @@ namespace VehicleParts.API.Controllers
             user.PhoneNumber = dto.PhoneNumber;
             user.ProfilePictureUrl = dto.ProfilePictureUrl;
 
+            if (!string.IsNullOrEmpty(dto.Password))
+            {
+                user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password);
+            }
+
             await _context.SaveChangesAsync();
 
             return Ok(ApiResponse<object>.SuccessResponse("Profile updated successfully", new { 

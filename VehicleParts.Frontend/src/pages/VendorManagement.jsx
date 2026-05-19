@@ -25,6 +25,9 @@ const VendorManagement = () => {
         address: ''
     });
 
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [deleteId, setDeleteId] = useState(null);
+
     useEffect(() => {
         fetchVendors();
     }, []);
@@ -103,11 +106,18 @@ const VendorManagement = () => {
         }
     };
 
-    const handleDelete = async (id) => {
-        if (!window.confirm("Are you sure you want to delete this vendor?")) return;
+    const handleDeleteClick = (id) => {
+        setDeleteId(id);
+        setShowDeleteModal(true);
+    };
+
+    const confirmDelete = async () => {
+        if (!deleteId) return;
         try {
-            await deleteVendor(id);
-            toast.success("Vendor deleted successfully");
+            await deleteVendor(deleteId);
+            toast.success("Vendor deleted successfully!");
+            setShowDeleteModal(false);
+            setDeleteId(null);
             fetchVendors();
         } catch (error) {
             toast.error("Failed to delete vendor");
@@ -158,7 +168,7 @@ const VendorManagement = () => {
                                 <td style={{ padding: '16px' }}>{vendor.email}</td>
                                 <td style={{ padding: '16px', textAlign: 'right' }}>
                                     <button onClick={() => handleEditClick(vendor)} style={{ background: 'transparent', color: 'var(--primary)', border: 'none', marginRight: '12px', cursor: 'pointer', fontWeight: '600' }}>Edit</button>
-                                    <button onClick={() => handleDelete(vendor.id)} style={{ background: 'transparent', color: '#ef4444', border: 'none', cursor: 'pointer', fontWeight: '600' }}>Delete</button>
+                                    <button onClick={() => handleDeleteClick(vendor.id)} style={{ background: 'transparent', color: '#ef4444', border: 'none', cursor: 'pointer', fontWeight: '600' }}>Delete</button>
                                 </td>
                             </tr>
                         ))}
@@ -208,6 +218,57 @@ const VendorManagement = () => {
                                 Cancel
                             </button>
                         </form>
+                    </div>
+                </div>
+            )}
+
+            {showDeleteModal && (
+                <div className="modal-overlay">
+                    <div className="auth-card" style={{ width: '100%', maxWidth: '400px', textAlign: 'center', padding: '30px' }}>
+                        <div style={{ fontSize: '50px', marginBottom: '16px' }}>⚠️</div>
+                        <h2 style={{ fontSize: '20px', fontWeight: '700', marginBottom: '10px' }}>Confirm Deletion</h2>
+                        <p style={{ color: 'var(--text-muted)', fontSize: '14px', marginBottom: '24px' }}>
+                            Are you sure you want to delete this vendor? This action cannot be undone.
+                        </p>
+                        <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+                            <button 
+                                type="button"
+                                onClick={() => {
+                                    setShowDeleteModal(false);
+                                    setDeleteId(null);
+                                }} 
+                                className="auth-button" 
+                                style={{ 
+                                    background: '#e2e8f0', 
+                                    color: '#475569', 
+                                    width: 'auto', 
+                                    padding: '10px 24px',
+                                    borderRadius: '10px',
+                                    fontWeight: '600',
+                                    border: 'none',
+                                    cursor: 'pointer'
+                                }}
+                            >
+                                Cancel
+                            </button>
+                            <button 
+                                type="button"
+                                onClick={confirmDelete} 
+                                className="auth-button" 
+                                style={{ 
+                                    background: '#ef4444', 
+                                    color: 'white', 
+                                    width: 'auto', 
+                                    padding: '10px 24px',
+                                    borderRadius: '10px',
+                                    fontWeight: '600',
+                                    border: 'none',
+                                    cursor: 'pointer'
+                                }}
+                            >
+                                Delete
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}

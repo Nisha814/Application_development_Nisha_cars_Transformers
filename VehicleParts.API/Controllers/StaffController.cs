@@ -33,11 +33,34 @@ namespace VehicleParts.API.Controllers
                     u.FullName,
                     u.Email,
                     u.PhoneNumber,
-                    u.CreatedAt
+                    u.CreatedAt,
+                    Role = "Staff",
+                    u.IsActive
                 })
                 .ToListAsync();
 
             return Ok(ApiResponse<object>.SuccessResponse("Staff members retrieved successfully", staffList));
+        }
+
+        [HttpGet("customers")]
+        public async Task<IActionResult> GetAllCustomers()
+        {
+            var customerList = await _context.Users
+                .Where(u => u.Role == UserRole.Customer)
+                .Select(u => new
+                {
+                    u.Id,
+                    u.FullName,
+                    u.Email,
+                    u.PhoneNumber,
+                    u.CreatedAt,
+                    Role = "Customer",
+                    u.IsVerified,
+                    u.IsActive
+                })
+                .ToListAsync();
+
+            return Ok(ApiResponse<object>.SuccessResponse("Customers retrieved successfully", customerList));
         }
 
         [HttpGet("{id}")]
@@ -51,7 +74,9 @@ namespace VehicleParts.API.Controllers
                     u.FullName,
                     u.Email,
                     u.PhoneNumber,
-                    u.CreatedAt
+                    u.CreatedAt,
+                    Role = "Staff",
+                    u.IsActive
                 })
                 .FirstOrDefaultAsync();
 
@@ -84,7 +109,9 @@ namespace VehicleParts.API.Controllers
                 Email = dto.Email,
                 PhoneNumber = dto.PhoneNumber,
                 PasswordHash = passwordHash,
-                Role = UserRole.Staff
+                Role = UserRole.Staff,
+                IsVerified = true,
+                IsActive = true
             };
 
             _context.Users.Add(newStaff);

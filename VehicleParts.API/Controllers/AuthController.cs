@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 using System.Threading.Tasks;
 using VehicleParts.API.Data;
 using VehicleParts.API.DTOs;
@@ -72,15 +73,25 @@ namespace VehicleParts.API.Controllers
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
-            try
+            // Log OTP to console for easy development diagnostics
+            Console.WriteLine($"\n==================================================");
+            Console.WriteLine($"[DIAGNOSTICS] Generated OTP for {user.Email}: {otp}");
+            Console.WriteLine($"==================================================\n");
+
+            // Dispatch SMTP email in the background to prevent blocking the HTTP response thread
+            _ = Task.Run(async () =>
             {
-                await _emailService.SendOtpEmailAsync(user.Email, otp);
-                return Ok(ApiResponse<object>.SuccessResponse("Registration successful. Please check your email for the verification code.", new { email = user.Email }));
-            }
-            catch (Exception)
-            {
-                return BadRequest(ApiResponse<object>.ErrorResponse("User registered, but failed to send verification email. Please contact support."));
-            }
+                try
+                {
+                    await _emailService.SendOtpEmailAsync(user.Email, otp);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[ERROR] Background email dispatch failed for {user.Email}: {ex.Message}");
+                }
+            });
+
+            return Ok(ApiResponse<object>.SuccessResponse("Registration successful. Please check your email for the verification code.", new { email = user.Email }));
         }
 
         [HttpPost("verify-otp")]
@@ -116,16 +127,15 @@ namespace VehicleParts.API.Controllers
                 return BadRequest(ApiResponse<object>.ErrorResponse("Invalid email or password"));
             }
 
-            // ABSOLUTE BYPASS: Main Admin account never needs verification
-            if (!user.IsVerified && user.Role != UserRole.Admin && user.Email.ToLower() != "admin@vehicleparts.com")
+            // ABSOLUTE BYPASS: Main Admin and Staff accounts never need verification
+            if (!user.IsVerified && user.Role != UserRole.Admin && user.Role != UserRole.Staff && user.Email.ToLower() != "admin@vehicleparts.com")
             {
                 return BadRequest(ApiResponse<object>.ErrorResponse("Your account is not verified. Please check your email for the OTP."));
             }
 
-            if (!user.IsActive)
-            {
-                return BadRequest(ApiResponse<object>.ErrorResponse("Your account has been deactivated. Please contact support."));
-            }
+            // Set user status to active (logged in)
+            user.IsActive = true;
+            await _context.SaveChangesAsync();
 
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!);
@@ -158,11 +168,79 @@ namespace VehicleParts.API.Controllers
                 profilePictureUrl = user.ProfilePictureUrl
             }));
         }
+
+        [HttpPost("resend-otp")]
+        public async Task<IActionResult> ResendOtp([FromBody] ResendOtpDto dto)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == dto.Email.ToLower());
+            if (user == null)
+            {
+                return NotFound(ApiResponse<object>.ErrorResponse("User not found"));
+            }
+
+            if (user.IsVerified)
+            {
+                return BadRequest(ApiResponse<object>.ErrorResponse("Account is already verified. Please log in."));
+            }
+
+            var otp = new Random().Next(100000, 999999).ToString();
+            user.OtpCode = otp;
+            user.OtpExpiry = DateTime.UtcNow.AddMinutes(10);
+
+            await _context.SaveChangesAsync();
+
+            // Log OTP to console for easy development diagnostics
+            Console.WriteLine($"\n==================================================");
+            Console.WriteLine($"[DIAGNOSTICS] Resent OTP for {user.Email}: {otp}");
+            Console.WriteLine($"==================================================\n");
+
+            // Dispatch SMTP email in the background to prevent blocking the HTTP response thread
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    await _emailService.SendOtpEmailAsync(user.Email, otp);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[ERROR] Background email dispatch failed for {user.Email}: {ex.Message}");
+                }
+            });
+
+            return Ok(ApiResponse<object>.SuccessResponse("A new OTP verification code has been sent to your email."));
+        }
+
+        [HttpPost("logout")]
+        [Authorize]
+        public async Task<IActionResult> Logout()
+        {
+            var emailClaim = User.FindFirst(ClaimTypes.Email)?.Value 
+                             ?? User.FindFirst(JwtRegisteredClaimNames.Email)?.Value;
+
+            if (string.IsNullOrEmpty(emailClaim))
+            {
+                return BadRequest(ApiResponse<object>.ErrorResponse("Invalid user context"));
+            }
+
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == emailClaim.ToLower());
+            if (user != null)
+            {
+                user.IsActive = false;
+                await _context.SaveChangesAsync();
+            }
+
+            return Ok(ApiResponse<object>.SuccessResponse("Logged out successfully"));
+        }
     }
 
     public class VerifyOtpDto
     {
         public string Email { get; set; } = string.Empty;
         public string OtpCode { get; set; } = string.Empty;
+    }
+
+    public class ResendOtpDto
+    {
+        public string Email { get; set; } = string.Empty;
     }
 }
