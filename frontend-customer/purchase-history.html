@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Purchase History - The Nisha Cars Transformers</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <div id="sidebar-container"></div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Content Header -->
+      <div id="header-container"></div>
+
+      <!-- Main Purchase Container -->
+      <div class="card" style="flex-grow: 1;">
+        <h3 style="font-size: 1.25rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+          <i data-lucide="shopping-bag" style="color: var(--accent-primary);"></i> My Purchases
+        </h3>
+
+        <!-- Table containing purchases -->
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Item Name</th>
+                <th>Category</th>
+                <th>Quantity</th>
+                <th>Unit Price</th>
+                <th>Total Price</th>
+              </tr>
+            </thead>
+            <tbody id="purchase-table-body">
+              <tr>
+                <td colspan="6" style="color: var(--text-secondary); text-align: center;">Loading purchase records...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/sidebar.js?v=2.0"></script>
+  <script src="js/purchase-history.js"></script>
+</body>
+</html>

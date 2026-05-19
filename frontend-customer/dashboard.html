@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Customer Dashboard - The Nisha Cars Transformers</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <div id="sidebar-container"></div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Content Header (Title + User Nav) -->
+      <div id="header-container"></div>
+
+      <!-- Welcome Banner -->
+      <div class="card" style="margin-bottom: 2rem; background: linear-gradient(135deg, rgba(255, 71, 87, 0.15) 0%, rgba(30, 144, 255, 0.05) 100%); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1.5rem;">
+        <div>
+          <h2 style="font-size: 1.8rem; margin-bottom: 0.5rem;">Welcome back, <span id="welcome-name">Customer</span>!</h2>
+          <p style="color: var(--text-secondary); max-width: 500px;">Keep your vehicle in prime performance. Easily schedule repairs, request rare parts, and view your complete service records here.</p>
+        </div>
+        <div>
+          <a href="appointments.html" class="btn btn-primary">
+            <i data-lucide="calendar"></i> Book Next Service
+          </a>
+        </div>
+      </div>
+
+      <!-- Status Summary Cards -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+        <!-- Card 1: Appointments -->
+        <div class="card" style="display: flex; align-items: center; gap: 1.25rem;">
+          <div style="background: rgba(255, 165, 2, 0.15); color: var(--status-pending); width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+            <i data-lucide="calendar-days"></i>
+          </div>
+          <div>
+            <div style="font-size: 0.85rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 600;">Upcoming Visits</div>
+            <div style="font-size: 1.8rem; font-weight: 700; font-family: var(--font-family-title);" id="stat-appointments">0</div>
+          </div>
+        </div>
+
+        <!-- Card 2: Pending Payments -->
+        <div class="card" style="display: flex; align-items: center; gap: 1.25rem;">
+          <div style="background: rgba(255, 71, 87, 0.15); color: var(--status-danger); width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+            <i data-lucide="wallet"></i>
+          </div>
+          <div>
+            <div style="font-size: 0.85rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 600;">Pending Invoices</div>
+            <div style="font-size: 1.8rem; font-weight: 700; font-family: var(--font-family-title);" id="stat-payments">0</div>
+          </div>
+        </div>
+
+        <!-- Card 3: Part Requests -->
+        <div class="card" style="display: flex; align-items: center; gap: 1.25rem;">
+          <div style="background: rgba(30, 144, 255, 0.15); color: var(--status-info); width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+            <i data-lucide="cpu"></i>
+          </div>
+          <div>
+            <div style="font-size: 0.85rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 600;">Part Requests</div>
+            <div style="font-size: 1.8rem; font-weight: 700; font-family: var(--font-family-title);" id="stat-part-requests">0</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dashboard Two Column Content -->
+      <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 1.5rem; flex-grow: 1;">
+        <!-- Left Column: Service Centers -->
+        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+          <div class="card" style="flex-grow: 1;">
+            <h3 style="font-size: 1.25rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+              <i data-lucide="map-pin" style="color: var(--accent-primary);"></i> Service Center Locations
+            </h3>
+            <div id="service-centers-list" style="display: flex; flex-direction: column; gap: 1rem;">
+              <p style="color: var(--text-secondary);">Loading service centers...</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Notifications Panel -->
+        <div class="card" style="display: flex; flex-direction: column;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <h3 style="font-size: 1.25rem; display: flex; align-items: center; gap: 0.5rem; margin: 0;">
+              <i data-lucide="bell-ring" style="color: var(--accent-primary);"></i> Notifications
+            </h3>
+            <button id="mark-all-read" class="btn btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.8rem;">
+              Mark all as read
+            </button>
+          </div>
+          <div id="notifications-list" style="display: flex; flex-direction: column; gap: 0.75rem; overflow-y: auto; max-height: 400px; flex-grow: 1;">
+            <p style="color: var(--text-secondary);">Loading alerts...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/sidebar.js?v=2.0"></script>
+  <script src="js/dashboard.js"></script>
+</body>
+</html>

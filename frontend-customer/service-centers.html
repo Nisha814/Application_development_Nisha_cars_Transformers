@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Service Centers - The Nisha Cars Transformers</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    .center-card {
+      background: var(--bg-card);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 16px;
+      padding: 2rem;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .center-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.35);
+    }
+    .center-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1.25rem;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .center-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+      flex-shrink: 0;
+    }
+    .center-name {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      font-family: var(--font-family-title);
+    }
+    .info-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      padding: 0.65rem 0;
+    }
+    .info-row i {
+      width: 18px;
+      height: 18px;
+      color: var(--accent-primary);
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .info-label {
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+    .info-value {
+      font-size: 0.95rem;
+      color: var(--text-primary);
+      margin-top: 2px;
+    }
+    .services-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+    .service-tag {
+      background: rgba(30, 144, 255, 0.1);
+      color: var(--accent-primary);
+      border: 1px solid rgba(30, 144, 255, 0.2);
+      padding: 0.3rem 0.7rem;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      font-weight: 500;
+    }
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      background: rgba(46, 213, 115, 0.12);
+      color: var(--status-success);
+      padding: 0.25rem 0.65rem;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      font-weight: 600;
+    }
+    .status-badge .pulse-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--status-success);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <div id="sidebar-container"></div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Content Header -->
+      <div id="header-container"></div>
+
+      <!-- Alert Container -->
+      <div id="alert-container"></div>
+
+      <!-- Search & Filter Bar -->
+      <div class="card" style="padding: 1rem 1.5rem; margin-bottom: 1.5rem; display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+        <div style="flex-grow: 1; position: relative;">
+          <i data-lucide="search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; color: var(--text-secondary);"></i>
+          <input type="text" id="center-search" class="form-control" placeholder="Search by name, address, or service..." style="padding-left: 38px;">
+        </div>
+        <select id="service-filter" class="form-control" style="max-width: 220px;">
+          <option value="">All Services</option>
+        </select>
+      </div>
+
+      <!-- Service Centers Grid -->
+      <div id="centers-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 1.5rem; flex-grow: 1;">
+        <p style="color: var(--text-secondary);">Loading service centers...</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/sidebar.js?v=2.0"></script>
+  <script src="js/service-centers.js"></script>
+</body>
+</html>

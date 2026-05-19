@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Part Requests - The Nisha Cars Transformers</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <div id="sidebar-container"></div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Content Header -->
+      <div id="header-container"></div>
+
+      <!-- Alert Container -->
+      <div id="alert-container"></div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 1.5rem; flex-grow: 1;">
+        <!-- Left: Submit Request Form -->
+        <div class="card" style="height: fit-content;">
+          <h3 style="font-size: 1.25rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+            <i data-lucide="package-plus" style="color: var(--accent-primary);"></i> Request Unavailable Part
+          </h3>
+          <form id="part-request-form">
+            <div class="form-group">
+              <label class="form-label" for="part-name">Part Name / Component</label>
+              <input type="text" id="part-name" class="form-control" placeholder="e.g. OEM Carbon Fiber Rear Spoiler" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="vehicle-make">Vehicle Make</label>
+              <input type="text" id="vehicle-make" class="form-control" placeholder="e.g. Tesla" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="vehicle-model">Vehicle Model</label>
+              <input type="text" id="vehicle-model" class="form-control" placeholder="e.g. Model 3" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="vehicle-year">Vehicle Year</label>
+              <input type="number" id="vehicle-year" class="form-control" placeholder="e.g. 2022" min="1900" max="2027" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="vehicle-plate">License Plate</label>
+              <input type="text" id="vehicle-plate" class="form-control" placeholder="e.g. BA-2-PA-1234" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="urgency">Urgency Level</label>
+              <select id="urgency" class="form-control" required>
+                <option value="" disabled selected>Select urgency...</option>
+                <option value="Low">Low - Stock / Spare Part</option>
+                <option value="Medium">Medium - Project / Upgrade</option>
+                <option value="High">High - Vehicle Inoperable</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="description">Detailed Description / OEM Part Number</label>
+              <textarea id="description" class="form-control" rows="4" placeholder="Enter parts numbers, compatibility details, or specific brand preferences..." required></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%;">
+              Submit Request <i data-lucide="send"></i>
+            </button>
+          </form>
+        </div>
+
+        <!-- Right: Previous Part Requests -->
+        <div class="card" style="display: flex; flex-direction: column;">
+          <h3 style="font-size: 1.25rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+            <i data-lucide="package" style="color: var(--accent-primary);"></i> Request History
+          </h3>
+          <div id="part-requests-list" style="display: flex; flex-direction: column; gap: 1rem; overflow-y: auto; max-height: 520px; flex-grow: 1;">
+            <p style="color: var(--text-secondary);">Loading your requests...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/sidebar.js?v=2.0"></script>
+  <script src="js/part-requests.js"></script>
+</body>
+</html>

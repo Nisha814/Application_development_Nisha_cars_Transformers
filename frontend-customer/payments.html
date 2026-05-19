@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Track Payments - The Nisha Cars Transformers</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <div id="sidebar-container"></div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Content Header -->
+      <div id="header-container"></div>
+
+      <!-- Alert Container -->
+      <div id="alert-container"></div>
+
+      <!-- Overview Cards for Payments -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+        <!-- Card 1: Outstanding Balance -->
+        <div class="card" style="display: flex; align-items: center; gap: 1.25rem;">
+          <div style="background: rgba(255, 71, 87, 0.15); color: var(--status-danger); width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+            <i data-lucide="alert-triangle"></i>
+          </div>
+          <div>
+            <div style="font-size: 0.85rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 600;">Outstanding Balance</div>
+            <div style="font-size: 1.8rem; font-weight: 700; font-family: var(--font-family-title); color: #ff4757;" id="outstanding-balance">$0.00</div>
+          </div>
+        </div>
+
+        <!-- Card 2: Total Paid -->
+        <div class="card" style="display: flex; align-items: center; gap: 1.25rem;">
+          <div style="background: rgba(46, 213, 115, 0.15); color: var(--status-success); width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+            <i data-lucide="check-circle-2"></i>
+          </div>
+          <div>
+            <div style="font-size: 0.85rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 600;">Total Paid This Year</div>
+            <div style="font-size: 1.8rem; font-weight: 700; font-family: var(--font-family-title); color: #2ed573;" id="total-paid">$0.00</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Payment Container -->
+      <div class="card" style="flex-grow: 1;">
+        <h3 style="font-size: 1.25rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+          <i data-lucide="receipt" style="color: var(--accent-primary);"></i> Invoices & Statements
+        </h3>
+
+        <!-- Table containing payments -->
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Description</th>
+                <th>Due Date</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Paid Date</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="payment-table-body">
+              <tr>
+                <td colspan="6" style="color: var(--text-secondary); text-align: center;">Loading statements...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      <!-- Custom Confirm Modal (Hidden by default) -->
+      <div id="payment-confirm-modal" style="display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.5); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
+        <div class="card" style="width: 100%; max-width: 400px; padding: 2rem; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+          <h3 style="font-size: 1.25rem; margin-bottom: 1rem; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
+            <i data-lucide="help-circle" style="color: var(--accent-primary);"></i> Confirm Payment
+          </h3>
+          <p id="payment-confirm-text" style="color: var(--text-secondary); margin-bottom: 1.5rem; line-height: 1.5;"></p>
+          <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+            <button id="payment-cancel-btn" class="btn btn-secondary" style="padding: 0.5rem 1rem;">Cancel</button>
+            <button id="payment-confirm-btn" class="btn btn-primary" style="padding: 0.5rem 1rem;">Confirm Payment</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/sidebar.js?v=2.0"></script>
+  <script src="js/payments.js?v=1.1"></script>
+</body>
+</html>
