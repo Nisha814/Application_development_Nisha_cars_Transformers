@@ -2,8 +2,11 @@
     ViewData["Title"] = "Customer Records";
     ViewData["ActivePage"] = "Records";
     var customers = ViewBag.Customers as List<AutoCarePro.Models.Customer> ?? new();
+    var cities = ViewBag.Cities as List<string> ?? new();
     string search = ViewBag.Search ?? "";
     string sort = ViewBag.Sort ?? "newest";
+    string selectedCity = ViewBag.SelectedCity ?? "All";
+    string selectedStatus = ViewBag.SelectedStatus ?? "All";
 }
 
 <div class="page-header">
@@ -17,15 +20,34 @@
     </a>
 </div>
 
-<div class="records-toolbar">
-    <form method="get" asp-action="Index" id="records-filter-form">
-        <div class="search-box wide">
-            <span class="material-symbols-outlined search-icon">search</span>
-            <input type="text" name="search" value="@search" class="search-input"
-                   placeholder="Search by name, email, or phone..." id="records-search" />
-            <input type="hidden" name="sort" value="@sort" id="sort-hidden" />
+<div class="records-toolbar" style="margin-bottom: 20px;">
+    <form method="get" asp-action="Index" id="records-filter-form" style="display:flex; flex-direction:column; gap:12px; width: 100%;">
+        <div style="display:flex; gap:12px; align-items:center; width: 100%; flex-wrap: wrap;">
+            <div class="search-box wide" style="flex:1; min-width: 250px;">
+                <span class="material-symbols-outlined search-icon">search</span>
+                <input type="text" name="search" value="@search" class="search-input"
+                       placeholder="Search by name, ID, phone, or plate..." id="records-search" />
+                <input type="hidden" name="sort" value="@sort" id="sort-hidden" />
+            </div>
+            
+            <div style="display:flex; gap:8px;">
+                <select name="city" class="form-control" onchange="this.form.submit()" style="padding: 10px 16px; border-radius: 8px; border: 1px solid var(--border); font-family: inherit; font-size: 0.9rem; background: white; cursor: pointer; min-width: 130px;">
+                    <option value="All">All Cities</option>
+                    @foreach (var c in cities)
+                    {
+                        <option value="@c" selected="@(selectedCity == c ? "selected" : null)">@c</option>
+                    }
+                </select>
+                
+                <select name="status" class="form-control" onchange="this.form.submit()" style="padding: 10px 16px; border-radius: 8px; border: 1px solid var(--border); font-family: inherit; font-size: 0.9rem; background: white; cursor: pointer; min-width: 130px;">
+                    <option value="All">All Statuses</option>
+                    <option value="Active" selected="@(selectedStatus == "Active" ? "selected" : null)">Active</option>
+                    <option value="Inactive" selected="@(selectedStatus == "Inactive" ? "selected" : null)">Inactive</option>
+                </select>
+            </div>
         </div>
-        <div class="sort-pills">
+        
+        <div class="sort-pills" style="margin-top:0;">
             <button type="button" class="sort-pill @(sort == "newest" ? "active" : "")"
                     onclick="setSort('newest')" id="sort-newest">Newest First</button>
             <button type="button" class="sort-pill @(sort == "name" ? "active" : "")"
@@ -46,6 +68,7 @@
                 <th class="text-center">VEHICLES</th>
                 <th class="text-center">SERVICES</th>
                 <th>REGISTERED</th>
+                <th>ACTIONS</th>
             </tr>
         </thead>
         <tbody>
@@ -57,7 +80,7 @@
                     <td>
                         <div class="customer-cell">
                             <div class="avatar sm" style="background:@GetAvatarColor(c.FullName)">@GetInitials(c.FullName)</div>
-                            <span class="customer-name-cell">@c.FullName</span>
+                            <a asp-action="Details" asp-route-id="@c.Id" class="customer-name-cell" style="text-decoration:none; color:inherit; font-weight:600; cursor:pointer;">@c.FullName</a>
                         </div>
                     </td>
                     <td>
@@ -68,14 +91,107 @@
                     <td class="text-center"><span class="count-badge teal">@vehicleCount</span></td>
                     <td class="text-center"><span class="count-badge blue">@serviceCount</span></td>
                     <td>@c.RegisteredDate.ToString("d/M/yyyy")</td>
+                    <td>
+                        <div style="display: flex; gap: 8px;">
+                            <button class="btn-icon" onclick="openCustomerEditModal(@c.Id, '@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(c.FullName))', '@c.Email', '@c.Phone', '@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(c.Address))', '@c.CNIC', '@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(c.City))', '@c.Status')" style="background: none; border: none; cursor: pointer; color: #4b5563; display: flex; align-items: center; justify-content: center; padding: 4px;">
+                                <span class="material-symbols-outlined" style="font-size: 18px;">edit</span>
+                            </button>
+                            <button class="btn-icon" onclick="openCustomerDeleteModal(@c.Id)" style="background: none; border: none; cursor: pointer; color: #dc2626; display: flex; align-items: center; justify-content: center; padding: 4px;">
+                                <span class="material-symbols-outlined" style="font-size: 18px;">delete</span>
+                            </button>
+                        </div>
+                    </td>
                 </tr>
             }
             @if (!customers.Any())
             {
-                <tr><td colspan="6" class="empty-state center">No customers found.</td></tr>
+                <tr><td colspan="7" class="empty-state center">No customers found.</td></tr>
             }
         </tbody>
     </table>
+</div>
+
+<!-- Edit Customer Modal -->
+<div class="modal-overlay" id="edit-customer-modal" onclick="closeCustomerEditModalOnOverlay(event)" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+    <div class="modal" style="background: white; padding: 24px; border-radius: 12px; width: 100%; max-width: 500px;">
+        <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2 class="modal-title" style="margin: 0; font-size: 18px; font-weight: 600;">Edit Customer Records</h2>
+            <button class="modal-close" onclick="closeCustomerEditModal()" style="background: none; border: none; cursor: pointer;">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+        <form asp-controller="Records" asp-action="Edit" method="post" id="edit-customer-form">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="Id" id="edit-cust-id" />
+            
+            <div class="form-group" style="margin-bottom: 16px;">
+                <label class="form-label" style="display: block; font-size: 14px; font-weight: 500; margin-bottom: 4px;">Full Name *</label>
+                <input type="text" name="FullName" id="edit-cust-fullname" class="form-control" style="width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 6px;" required />
+            </div>
+
+            <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+                <div class="form-group">
+                    <label class="form-label" style="display: block; font-size: 14px; font-weight: 500; margin-bottom: 4px;">Phone Number *</label>
+                    <input type="text" name="Phone" id="edit-cust-phone" class="form-control" style="width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 6px;" required />
+                </div>
+                <div class="form-group">
+                    <label class="form-label" style="display: block; font-size: 14px; font-weight: 500; margin-bottom: 4px;">Email Address</label>
+                    <input type="email" name="Email" id="edit-cust-email" class="form-control" style="width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 6px;" />
+                </div>
+            </div>
+            
+            <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+                <div class="form-group">
+                    <label class="form-label" style="display: block; font-size: 14px; font-weight: 500; margin-bottom: 4px;">CNIC / ID *</label>
+                    <input type="text" name="CNIC" id="edit-cust-cnic" class="form-control" style="width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 6px;" required />
+                </div>
+                <div class="form-group">
+                    <label class="form-label" style="display: block; font-size: 14px; font-weight: 500; margin-bottom: 4px;">City</label>
+                    <input type="text" name="City" id="edit-cust-city" class="form-control" style="width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 6px;" />
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 16px;">
+                <label class="form-label" style="display: block; font-size: 14px; font-weight: 500; margin-bottom: 4px;">Address</label>
+                <textarea name="Address" id="edit-cust-address" class="form-control" style="width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 6px; height: 60px;"></textarea>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 24px;">
+                <label class="form-label" style="display: block; font-size: 14px; font-weight: 500; margin-bottom: 4px;">Status</label>
+                <select name="Status" id="edit-cust-status" class="form-control" style="width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 6px;">
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                </select>
+            </div>
+            
+            <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 12px;">
+                <button type="button" class="btn-secondary" onclick="closeCustomerEditModal()" style="padding: 8px 16px; border: 1px solid #d1d5db; border-radius: 6px; background: white; cursor: pointer;">Cancel</button>
+                <button type="submit" class="btn-primary" style="padding: 8px 16px; border: none; border-radius: 6px; background: #111827; color: white; cursor: pointer; font-weight: 500;">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Delete Customer Modal -->
+<div class="modal-overlay" id="delete-customer-modal" onclick="closeCustomerDeleteModalOnOverlay(event)" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+    <div class="modal" style="background: white; padding: 24px; border-radius: 12px; width: 100%; max-width: 400px;">
+        <div style="text-align: center; margin-bottom: 20px;">
+            <div style="background: #fee2e2; width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px auto;">
+                <span class="material-symbols-outlined" style="color: #dc2626; font-size: 24px;">delete</span>
+            </div>
+            <h2 style="margin: 0 0 8px 0; font-size: 18px; font-weight: 600;">Delete Customer</h2>
+            <p style="margin: 0; color: #6b7280; font-size: 14px;">Are you sure you want to delete this customer? This will also delete all associated vehicles and services!</p>
+        </div>
+        <form asp-controller="Records" asp-action="Delete" method="post" id="delete-customer-form">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="id" id="delete-cust-id" />
+            
+            <div style="display: flex; gap: 12px;">
+                <button type="button" style="flex: 1; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; background: white; cursor: pointer; font-weight: 500;" onclick="closeCustomerDeleteModal()">Cancel</button>
+                <button type="submit" style="flex: 1; padding: 10px; border: none; border-radius: 6px; background: #dc2626; color: white; cursor: pointer; font-weight: 500;">Delete</button>
+            </div>
+        </form>
+    </div>
 </div>
 
 @section Scripts {
@@ -83,6 +199,43 @@
 function setSort(value) {
     document.getElementById('sort-hidden').value = value;
     document.getElementById('records-filter-form').submit();
+}
+
+function openCustomerEditModal(id, name, email, phone, address, cnic, city, status) {
+    document.getElementById('edit-cust-id').value = id;
+    document.getElementById('edit-cust-fullname').value = name;
+    document.getElementById('edit-cust-email').value = email;
+    document.getElementById('edit-cust-phone').value = phone;
+    document.getElementById('edit-cust-address').value = address;
+    document.getElementById('edit-cust-cnic').value = cnic;
+    document.getElementById('edit-cust-city').value = city;
+    document.getElementById('edit-cust-status').value = status;
+    document.getElementById('edit-customer-modal').style.display = 'flex';
+}
+
+function closeCustomerEditModal() {
+    document.getElementById('edit-customer-modal').style.display = 'none';
+}
+
+function closeCustomerEditModalOnOverlay(e) {
+    if (e.target.id === 'edit-customer-modal') {
+        closeCustomerEditModal();
+    }
+}
+
+function openCustomerDeleteModal(id) {
+    document.getElementById('delete-cust-id').value = id;
+    document.getElementById('delete-customer-modal').style.display = 'flex';
+}
+
+function closeCustomerDeleteModal() {
+    document.getElementById('delete-customer-modal').style.display = 'none';
+}
+
+function closeCustomerDeleteModalOnOverlay(e) {
+    if (e.target.id === 'delete-customer-modal') {
+        closeCustomerDeleteModal();
+    }
 }
 </script>
 }

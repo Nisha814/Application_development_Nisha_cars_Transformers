@@ -30,6 +30,10 @@ namespace AutoCarePro.Models
 
         public string VIN { get; set; } = string.Empty;
 
+        public int Mileage { get; set; }
+
+        public string Status { get; set; } = "Active";
+
         public ICollection<Service> Services { get; set; } = new List<Service>();
     }
 }

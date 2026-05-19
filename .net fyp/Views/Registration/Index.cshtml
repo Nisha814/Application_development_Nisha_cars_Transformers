@@ -7,48 +7,137 @@
 
 <div class="page-header">
     <div>
-        <h1 class="page-title">Customer Registration</h1>
-        <p class="page-subtitle">Register a new customer to the system</p>
+        <h1 class="page-title">Register New Customer</h1>
+        <p class="page-subtitle">Fill in the details below to register a new customer</p>
     </div>
 </div>
 
 <div class="form-card">
     <form asp-action="Index" method="post" id="registration-form">
         @Html.AntiForgeryToken()
-        <div class="validation-summary">
-            <span asp-validation-summary="ModelOnly" class="text-danger"></span>
+        
+        <!-- Personal Information -->
+        <div class="section-header" style="display:flex; align-items:center; gap:0.5rem; margin-bottom:1rem; color:var(--orange);">
+            <span class="material-symbols-outlined">person</span>
+            <h2 style="font-size:1.1rem; font-weight:600;">Personal Information</h2>
         </div>
 
         <div class="form-group">
-            <label asp-for="FullName" class="form-label">Full Name</label>
-            <input asp-for="FullName" class="form-control" placeholder="Enter full name" id="input-fullname" />
+            <label asp-for="FullName" class="form-label">Full Name *</label>
+            <input asp-for="FullName" class="form-control" placeholder="Muhammad Ali Khan" />
             <span asp-validation-for="FullName" class="field-error"></span>
         </div>
 
         <div class="form-row">
             <div class="form-group">
-                <label asp-for="Email" class="form-label">Email Address</label>
-                <input asp-for="Email" class="form-control" placeholder="email@example.com" id="input-email" />
-                <span asp-validation-for="Email" class="field-error"></span>
+                <label asp-for="Phone" class="form-label">Phone Number *</label>
+                <input asp-for="Phone" class="form-control" placeholder="+92-300-1234567" />
+                <span asp-validation-for="Phone" class="field-error"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Phone" class="form-label">Phone Number</label>
-                <input asp-for="Phone" class="form-control" placeholder="+91 98765 43210" id="input-phone" />
-                <span asp-validation-for="Phone" class="field-error"></span>
+                <label asp-for="Email" class="form-label">Email Address</label>
+                <input asp-for="Email" class="form-control" placeholder="example@email.com" />
+                <span asp-validation-for="Email" class="field-error"></span>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label asp-for="CNIC" class="form-label">CNIC / ID Number *</label>
+                <input asp-for="CNIC" class="form-control" placeholder="35202-1234567-1" />
+                <span asp-validation-for="CNIC" class="field-error"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="City" class="form-label">City</label>
+                <input asp-for="City" class="form-control" placeholder="Lahore" />
+                <span asp-validation-for="City" class="field-error"></span>
             </div>
         </div>
 
         <div class="form-group">
             <label asp-for="Address" class="form-label">Address</label>
-            <textarea asp-for="Address" class="form-control form-textarea" placeholder="Enter complete address" id="input-address" rows="3"></textarea>
+            <textarea asp-for="Address" class="form-control form-textarea" placeholder="Full address..."></textarea>
+            <span asp-validation-for="Address" class="field-error"></span>
         </div>
 
-        <button type="submit" class="btn-primary" id="btn-register-customer">
-            <span class="material-symbols-outlined">person_add</span>
-            Register Customer
-        </button>
+        <div class="form-group">
+            <label asp-for="Status" class="form-label">Status</label>
+            <select asp-for="Status" class="form-control">
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+            </select>
+            <span asp-validation-for="Status" class="field-error"></span>
+        </div>
+
+        <!-- Vehicle Details -->
+        <div class="card" style="margin-top:2rem; padding:1.5rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+                <div style="display:flex; align-items:center; gap:0.5rem; color:var(--orange);">
+                    <span class="material-symbols-outlined">directions_car</span>
+                    <h2 style="font-size:1.1rem; font-weight:600;">Vehicle Details</h2>
+                </div>
+                <button type="button" class="btn-secondary" id="btn-add-vehicle">
+                    <span class="material-symbols-outlined">add</span>
+                    Add Vehicle
+                </button>
+            </div>
+            <p style="color:var(--text-secondary); font-size:0.9rem;">Optionally register a vehicle for this customer</p>
+            
+            <!-- Hidden vehicle fields, shown when Add Vehicle is clicked -->
+            <div id="vehicle-fields" style="display:none; margin-top:1rem; border-top:1px solid var(--border); padding-top:1rem;">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Make *</label>
+                        <input name="Vehicles[0].Make" class="form-control" placeholder="Toyota" />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Model *</label>
+                        <input name="Vehicles[0].Model" class="form-control" placeholder="Corolla" />
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">License Plate *</label>
+                        <input name="Vehicles[0].LicensePlate" class="form-control" placeholder="ABC-123" />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Year</label>
+                        <input name="Vehicles[0].Year" type="number" class="form-control" placeholder="2022" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; margin-top:2rem;">
+            <a href="@Url.Action("Index", "Home")" class="btn-secondary">Cancel</a>
+            <button type="submit" class="btn-primary" style="background:black; color:white;">Register Customer</button>
+        </div>
     </form>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initially disable vehicle inputs since they are hidden
+        document.querySelectorAll('#vehicle-fields input').forEach(input => input.disabled = true);
+
+        document.getElementById('btn-add-vehicle').addEventListener('click', function() {
+            var fields = document.getElementById('vehicle-fields');
+            var inputs = fields.querySelectorAll('input');
+            if (fields.style.display === 'none') {
+                fields.style.display = 'block';
+                inputs.forEach(input => input.disabled = false);
+                this.innerHTML = '<span class="material-symbols-outlined">remove</span> Hide Vehicle';
+            } else {
+                fields.style.display = 'none';
+                inputs.forEach(input => {
+                    input.disabled = true;
+                    input.value = '';
+                });
+                this.innerHTML = '<span class="material-symbols-outlined">add</span> Add Vehicle';
+            }
+        });
+    });
+</script>
 
 <div class="card" style="margin-top:2rem;">
     <div class="card-header">
@@ -87,4 +176,8 @@
         var colors = new[] { "#f59e0b", "#10b981", "#3b82f6", "#8b5cf6", "#ec4899", "#06b6d4", "#f97316", "#84cc16" };
         return colors[Math.Abs(name.GetHashCode()) % colors.Length];
     }
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
 }

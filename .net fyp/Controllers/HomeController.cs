@@ -16,6 +16,7 @@ namespace AutoCarePro.Controllers
             ViewBag.TotalVehicles = await _db.Vehicles.CountAsync();
             ViewBag.TotalServices = await _db.Services.CountAsync();
             ViewBag.TotalRevenue = await _db.Services.SumAsync(s => s.Cost);
+            ViewBag.PendingJobs = await _db.Services.CountAsync(s => s.Status != "Completed");
 
             ViewBag.RecentServices = await _db.Services
                 .Include(s => s.Vehicle).ThenInclude(v => v!.Customer)

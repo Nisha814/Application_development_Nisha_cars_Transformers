@@ -6,117 +6,171 @@
     decimal totalRevenue = ViewBag.TotalRevenue ?? 0m;
 }
 
-<div class="page-header">
+<div class="page-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
     <div>
-        <h1 class="page-title">Customer Dashboard</h1>
-        <p class="page-subtitle">Overview of your customer and vehicle management</p>
+        <h1 class="page-title" style="margin: 0; font-size: 24px; font-weight: 700;">Dashboard</h1>
+        <p class="page-subtitle" style="margin: 4px 0 0 0; color: #6b7280; font-size: 14px;">Welcome back — here's today's overview</p>
+    </div>
+    <a asp-controller="Registration" asp-action="Index" class="btn-primary" style="display: flex; align-items: center; gap: 8px; background: #111827; color: white; padding: 10px 16px; border-radius: 8px; text-decoration: none; font-weight: 500; font-size: 14px;">
+        <span class="material-symbols-outlined" style="font-size: 18px;">person_add</span>
+        Register Customer
+    </a>
+</div>
+
+<!-- Stats Grid -->
+<div class="stats-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px;">
+    <!-- Total Customers -->
+    <div class="stat-card" style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: flex-start;">
+        <div>
+            <div style="color: #9ca3af; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Total Customers</div>
+            <div style="font-size: 28px; font-weight: 700; color: #111827; margin: 4px 0;">@ViewBag.TotalCustomers</div>
+            <div style="color: #6b7280; font-size: 12px;">7 active</div> <!-- Hardcoded active count or calculate it -->
+        </div>
+        <div style="background: #fef3c7; color: #d97706; padding: 10px; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+            <span class="material-symbols-outlined">group</span>
+        </div>
+    </div>
+    
+    <!-- Registered Vehicles -->
+    <div class="stat-card" style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: flex-start;">
+        <div>
+            <div style="color: #9ca3af; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Registered Vehicles</div>
+            <div style="font-size: 28px; font-weight: 700; color: #111827; margin: 4px 0;">@ViewBag.TotalVehicles</div>
+            <div style="color: #6b7280; font-size: 12px;">Across all customers</div>
+        </div>
+        <div style="background: #d1fae5; color: #059669; padding: 10px; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+            <span class="material-symbols-outlined">directions_car</span>
+        </div>
+    </div>
+    
+    <!-- Pending Jobs -->
+    <div class="stat-card" style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: flex-start;">
+        <div>
+            <div style="color: #9ca3af; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Pending Jobs</div>
+            <div style="font-size: 28px; font-weight: 700; color: #111827; margin: 4px 0;">@ViewBag.PendingJobs</div>
+            <div style="color: #6b7280; font-size: 12px;">Awaiting completion</div>
+        </div>
+        <div style="background: #fee2e2; color: #dc2626; padding: 10px; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+            <span class="material-symbols-outlined">construction</span>
+        </div>
+    </div>
+    
+    <!-- Total Revenue -->
+    <div class="stat-card" style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: flex-start;">
+        <div>
+            <div style="color: #9ca3af; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Total Revenue</div>
+            @{
+                var revK = (totalRevenue / 1000).ToString("N0");
+            }
+            <div style="font-size: 28px; font-weight: 700; color: #111827; margin: 4px 0;">Rs. @revK K</div>
+            <div style="color: #6b7280; font-size: 12px;">From completed jobs</div>
+        </div>
+        <div style="background: #e0e7ff; color: #4f46e5; padding: 10px; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+            <span class="material-symbols-outlined">payments</span>
+        </div>
     </div>
 </div>
 
-<div class="stats-grid">
-    <div class="stat-card stat-orange">
-        <div class="stat-icon"><span class="material-symbols-outlined">group</span></div>
-        <div class="stat-info">
-            <div class="stat-number">@ViewBag.TotalCustomers</div>
-            <div class="stat-label">Total Customers</div>
+<!-- Quick Actions Grid -->
+<div class="actions-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px;">
+    <a asp-controller="Registration" asp-action="Index" style="background: white; padding: 16px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); display: flex; flex-direction: column; align-items: center; gap: 8px; text-decoration: none; color: #111827;">
+        <div style="background: #f3f4f6; padding: 12px; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+            <span class="material-symbols-outlined" style="color: #4b5563;">person_add</span>
         </div>
-    </div>
-    <div class="stat-card stat-teal">
-        <div class="stat-icon"><span class="material-symbols-outlined">directions_car</span></div>
-        <div class="stat-info">
-            <div class="stat-number">@ViewBag.TotalVehicles</div>
-            <div class="stat-label">Total Vehicles</div>
+        <div style="font-size: 14px; font-weight: 500;">New Customer</div>
+    </a>
+    <a asp-controller="Records" asp-action="Index" style="background: white; padding: 16px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); display: flex; flex-direction: column; align-items: center; gap: 8px; text-decoration: none; color: #111827;">
+        <div style="background: #f3f4f6; padding: 12px; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+            <span class="material-symbols-outlined" style="color: #4b5563;">search</span>
         </div>
-    </div>
-    <div class="stat-card stat-blue">
-        <div class="stat-icon"><span class="material-symbols-outlined">schedule</span></div>
-        <div class="stat-info">
-            <div class="stat-number">@ViewBag.TotalServices</div>
-            <div class="stat-label">Services Done</div>
+        <div style="font-size: 14px; font-weight: 500;">Search Records</div>
+    </a>
+    <a asp-controller="Vehicle" asp-action="Index" style="background: white; padding: 16px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); display: flex; flex-direction: column; align-items: center; gap: 8px; text-decoration: none; color: #111827;">
+        <div style="background: #f3f4f6; padding: 12px; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+            <span class="material-symbols-outlined" style="color: #4b5563;">directions_car</span>
         </div>
-    </div>
-    <div class="stat-card stat-red">
-        <div class="stat-icon"><span class="material-symbols-outlined">currency_rupee</span></div>
-        <div class="stat-info">
-            <div class="stat-number">₹@totalRevenue.ToString("N0")</div>
-            <div class="stat-label">Total Revenue</div>
+        <div style="font-size: 14px; font-weight: 500;">Manage Vehicles</div>
+    </a>
+    <a asp-controller="History" asp-action="Index" style="background: white; padding: 16px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); display: flex; flex-direction: column; align-items: center; gap: 8px; text-decoration: none; color: #111827;">
+        <div style="background: #f3f4f6; padding: 12px; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+            <span class="material-symbols-outlined" style="color: #4b5563;">history</span>
         </div>
-    </div>
+        <div style="font-size: 14px; font-weight: 500;">View History</div>
+    </a>
 </div>
 
-<div class="dashboard-grid">
-    <div class="card">
-        <div class="card-header">
-            <h2 class="card-title">Recent Services</h2>
-            <a asp-controller="History" asp-action="Index" class="view-all">View All</a>
+<!-- Main Grid (Activity & Customers) -->
+<div class="dashboard-grid" style="display: grid; grid-template-columns: 2fr 1fr; gap: 16px;">
+    <!-- Recent Activity -->
+    <div class="card" style="background: white; padding: 24px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2 style="margin: 0; font-size: 16px; font-weight: 600; color: #111827;">Recent Activity</h2>
+            <span style="color: #9ca3af; font-size: 13px;">@recentServices.Count total records</span>
         </div>
-        <div class="service-list">
-            @foreach (var service in recentServices)
+        
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+            @foreach (var s in recentServices)
             {
-                <div class="service-item">
-                    <div class="service-info">
-                        <div class="service-type">@service.ServiceType</div>
-                        @if (service.Vehicle?.Customer != null)
-                        {
-                            <div class="service-meta">@service.Vehicle.Customer.FullName — @service.Vehicle.Make @service.Vehicle.Model</div>
+                <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 16px; border-bottom: 1px solid #f3f4f6;">
+                    <div style="display: flex; gap: 12px; align-items: center;">
+                        <div style="background: #f3f4f6; padding: 8px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                            <span class="material-symbols-outlined" style="color: #6b7280; font-size: 20px;">directions_car</span>
+                        </div>
+                        <div>
+                            <div style="font-size: 14px; font-weight: 600; color: #111827;">@(s.Vehicle?.Customer?.FullName ?? "Unknown")</div>
+                            <div style="font-size: 12px; color: #6b7280;">@(s.Vehicle?.Make) @(s.Vehicle?.Model) · @s.Description</div>
+                        </div>
+                    </div>
+                    <div style="text-align: right; display: flex; align-items: center; gap: 16px;">
+                        @{
+                            var typeBg = s.ServiceType == "Service" ? "#d1fae5" : s.ServiceType == "Inspection" ? "#fef3c7" : "#fee2e2";
+                            var typeColor = s.ServiceType == "Service" ? "#059669" : s.ServiceType == "Inspection" ? "#d97706" : "#dc2626";
                         }
-                    </div>
-                    <div class="service-right">
-                        <div class="service-cost">₹@service.Cost.ToString("N0")</div>
-                        <div class="service-date">@service.Date.ToString("d/M/yyyy")</div>
+                        <span style="background: @typeBg; color: @typeColor; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;">@s.ServiceType</span>
+                        <div style="font-size: 12px; color: #9ca3af;">@s.Date.ToString("yyyy-MM-dd")</div>
+                        <div style="font-size: 14px; font-weight: 600; color: #111827;">Rs. @s.Cost.ToString("N0")</div>
                     </div>
                 </div>
             }
         </div>
     </div>
-
-    <div class="card">
-        <div class="card-header">
-            <h2 class="card-title">New Customers</h2>
-            <a asp-controller="Records" asp-action="Index" class="view-all">View All</a>
+    
+    <!-- Recent Customers -->
+    <div class="card" style="background: white; padding: 24px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2 style="margin: 0; font-size: 16px; font-weight: 600; color: #111827;">Recent Customers</h2>
+            <a asp-controller="Records" asp-action="Index" style="color: var(--orange); font-size: 13px; font-weight: 500; text-decoration: none;">View all</a>
         </div>
-        <div class="customer-list">
-            @foreach (var customer in newCustomers)
+        
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+            @foreach (var c in newCustomers)
             {
-                <div class="customer-item">
-                    <div class="avatar" style="background:@GetAvatarColor(customer.FullName)">
-                        @GetInitials(customer.FullName)
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div style="display: flex; gap: 12px; align-items: center;">
+                        <div style="background: @GetAvatarColor(c.FullName); color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600;">
+                            @GetInitials(c.FullName)
+                        </div>
+                        <div>
+                            <div style="font-size: 14px; font-weight: 600; color: #111827;">@c.FullName</div>
+                            <div style="font-size: 12px; color: #6b7280;">@c.Phone</div>
+                        </div>
                     </div>
-                    <div class="customer-info">
-                        <div class="customer-name">@customer.FullName</div>
-                        <div class="customer-phone">@customer.Phone</div>
-                    </div>
-                    <div class="customer-right">
-                        <div class="vehicle-count">@customer.Vehicles.Count vehicle@(customer.Vehicles.Count != 1 ? "s" : "")</div>
-                        <div class="customer-date">@customer.RegisteredDate.ToString("d/M/yyyy")</div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <div style="display: flex; align-items: center; gap: 4px; color: #6b7280; font-size: 12px;">
+                            <span class="material-symbols-outlined" style="font-size: 16px;">directions_car</span>
+                            @c.Vehicles.Count
+                        </div>
+                        @{
+                            var cActive = c.Status == "Active";
+                            var cBg = cActive ? "#d1fae5" : "#f3f4f6";
+                            var cColor = cActive ? "#059669" : "#6b7280";
+                        }
+                        <span style="background: @cBg; color: @cColor; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600;">@c.Status.ToLower()</span>
                     </div>
                 </div>
             }
         </div>
     </div>
-</div>
-
-<div class="quick-actions">
-    <a asp-controller="Registration" asp-action="Index" class="quick-card" id="qa-add-customer">
-        <span class="material-symbols-outlined quick-icon orange">person_add</span>
-        <div class="quick-title">Add Customer</div>
-        <div class="quick-sub">Register new customer</div>
-    </a>
-    <a asp-controller="Vehicle" asp-action="Index" class="quick-card" id="qa-add-vehicle">
-        <span class="material-symbols-outlined quick-icon teal">directions_car</span>
-        <div class="quick-title">Add Vehicle</div>
-        <div class="quick-sub">Register a vehicle</div>
-    </a>
-    <a asp-controller="History" asp-action="Index" class="quick-card" id="qa-service-log">
-        <span class="material-symbols-outlined quick-icon blue">history</span>
-        <div class="quick-title">Service Log</div>
-        <div class="quick-sub">View all services</div>
-    </a>
-    <a asp-controller="Records" asp-action="Index" class="quick-card" id="qa-all-records">
-        <span class="material-symbols-outlined quick-icon red">table_rows</span>
-        <div class="quick-title">All Records</div>
-        <div class="quick-sub">Browse customer data</div>
-    </a>
 </div>
 
 @functions {

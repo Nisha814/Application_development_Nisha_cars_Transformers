@@ -1,0 +1,252 @@
+@model AutoCarePro.Models.Customer
+@{
+    ViewData["Title"] = "Customer Details";
+    ViewData["ActivePage"] = "Records";
+    var totalSpent = ViewBag.TotalSpent ?? 0;
+    var totalJobs = ViewBag.TotalJobs ?? 0;
+    var completedJobs = ViewBag.CompletedJobs ?? 0;
+    var pendingJobs = ViewBag.PendingJobs ?? 0;
+}
+
+<div style="margin-bottom: 1rem;">
+    <a href="@Url.Action("Index", "Records")" style="text-decoration: none; color: var(--text-secondary); display: flex; align-items: center; gap: 0.25rem;">
+        <span class="material-symbols-outlined" style="font-size: 1.2rem;">arrow_back</span>
+        Customer Records
+    </a>
+</div>
+
+<div class="card" style="padding: 1.5rem; margin-bottom: 1.5rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <div class="avatar" style="width: 64px; height: 64px; font-size: 1.5rem; background: #fef3c7; color: #d97706;">
+                @Model.FullName.Substring(0, 1).ToUpper()
+            </div>
+            <div>
+                <h1 style="font-size: 1.5rem; font-weight: 700; color: var(--text-primary);">@Model.FullName</h1>
+                <p style="color: var(--text-secondary); font-size: 0.9rem;">
+                    C@(Model.Id.ToString("D3")) · Registered @Model.RegisteredDate.ToString("yyyy-MM-dd")
+                </p>
+            </div>
+        </div>
+        <div class="status-badge @(Model.Status.ToLower())" style="background: #d1fae5; color: #065f46; padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.8rem; font-weight: 600;">
+            @Model.Status.ToLower()
+        </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; border-top: 1px solid var(--border); padding-top: 1rem;">
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <span class="material-symbols-outlined" style="color: var(--text-secondary);">phone</span>
+            <div>
+                <p style="font-size: 0.75rem; color: var(--text-muted);">Phone</p>
+                <p style="font-size: 0.9rem; font-weight: 500;">@Model.Phone</p>
+            </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <span class="material-symbols-outlined" style="color: var(--text-secondary);">mail</span>
+            <div>
+                <p style="font-size: 0.75rem; color: var(--text-muted);">Email</p>
+                <p style="font-size: 0.9rem; font-weight: 500;">@Model.Email</p>
+            </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <span class="material-symbols-outlined" style="color: var(--text-secondary);">directions_car</span>
+            <div>
+                <p style="font-size: 0.75rem; color: var(--text-muted);">Vehicles</p>
+                <p style="font-size: 0.9rem; font-weight: 500;">@Model.Vehicles.Count vehicle(s)</p>
+            </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <span class="material-symbols-outlined" style="color: var(--text-secondary);">payments</span>
+            <div>
+                <p style="font-size: 0.75rem; color: var(--text-muted);">Total Spent</p>
+                <p style="font-size: 0.9rem; font-weight: 500;">Rs. @totalSpent</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="filter-pills" style="margin-bottom: 1.5rem; display: flex; gap: 0.5rem;">
+    <button class="pill active" onclick="switchTab('overview', this)" style="border: none; background: none; font-family: inherit; font-size: 0.9rem; font-weight: 500; cursor: pointer; padding: 0.5rem 1rem; border-radius: 999px;">Overview</button>
+    <button class="pill" onclick="switchTab('vehicles', this)" style="border: none; background: none; font-family: inherit; font-size: 0.9rem; font-weight: 500; cursor: pointer; padding: 0.5rem 1rem; border-radius: 999px;">Vehicles</button>
+    <button class="pill" onclick="switchTab('history', this)" style="border: none; background: none; font-family: inherit; font-size: 0.9rem; font-weight: 500; cursor: pointer; padding: 0.5rem 1rem; border-radius: 999px;">History</button>
+</div>
+
+<!-- Tab Contents -->
+<div id="overview-tab" class="tab-content-panel">
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+        <!-- Personal Details -->
+        <div class="card" style="padding: 1.5rem;">
+            <h2 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem;">Personal Details</h2>
+            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                <div style="display: flex; justify-content: space-between;">
+                    <span style="color: var(--text-secondary); font-size: 0.9rem;">Full Name</span>
+                    <span style="font-weight: 500; font-size: 0.9rem;">@Model.FullName</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span style="color: var(--text-secondary); font-size: 0.9rem;">CNIC / ID</span>
+                    <span style="font-weight: 500; font-size: 0.9rem;">@Model.CNIC</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span style="color: var(--text-secondary); font-size: 0.9rem;">Phone</span>
+                    <span style="font-weight: 500; font-size: 0.9rem;">@Model.Phone</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span style="color: var(--text-secondary); font-size: 0.9rem;">Email</span>
+                    <span style="font-weight: 500; font-size: 0.9rem;">@Model.Email</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span style="color: var(--text-secondary); font-size: 0.9rem;">Address</span>
+                    <span style="font-weight: 500; font-size: 0.9rem; text-align: right;">@Model.Address</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Activity Summary -->
+        <div class="card" style="padding: 1.5rem;">
+            <h2 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem;">Activity Summary</h2>
+            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                <div style="display: flex; justify-content: space-between;">
+                    <span style="color: var(--text-secondary); font-size: 0.9rem;">Total Jobs</span>
+                    <span style="font-weight: 500; font-size: 0.9rem;">@totalJobs</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span style="color: var(--text-secondary); font-size: 0.9rem;">Completed</span>
+                    <span style="font-weight: 500; font-size: 0.9rem;">@completedJobs</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span style="color: var(--text-secondary); font-size: 0.9rem;">Pending</span>
+                    <span style="font-weight: 500; font-size: 0.9rem;">@pendingJobs</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span style="color: var(--text-secondary); font-size: 0.9rem;">Total Spent</span>
+                    <span style="font-weight: 500; font-size: 0.9rem;">Rs. @totalSpent</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span style="color: var(--text-secondary); font-size: 0.9rem;">Registered</span>
+                    <span style="font-weight: 500; font-size: 0.9rem;">@Model.RegisteredDate.ToString("yyyy-MM-dd")</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="vehicles-tab" class="tab-content-panel" style="display: none;">
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem;">
+        @foreach (var v in Model.Vehicles)
+        {
+            <div class="card" style="padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                        <div>
+                            <span class="badge" style="background: #e0f2fe; color: #0369a1; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase;">@v.Make</span>
+                            <h3 style="font-size: 1.1rem; font-weight: 600; margin: 0.5rem 0 0.25rem 0;">@v.Model</h3>
+                            <p style="color: var(--text-muted); font-size: 0.8rem; margin: 0;">Year: @v.Year · Color: @v.Color</p>
+                        </div>
+                        <div style="background: #f3f4f6; padding: 0.25rem 0.5rem; border-radius: 6px; font-size: 0.8rem; font-weight: 600; letter-spacing: 0.05em;">
+                            @v.LicensePlate
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem; border-top: 1px solid var(--border); padding-top: 1rem; margin-top: 1rem;">
+                        <div style="display: flex; justify-content: space-between; font-size: 0.85rem;">
+                            <span style="color: var(--text-secondary);">VIN:</span>
+                            <span style="font-weight: 500; font-family: monospace;">@v.VIN</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.85rem;">
+                            <span style="color: var(--text-secondary);">Mileage:</span>
+                            <span style="font-weight: 500;">@v.Mileage km</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.85rem;">
+                            <span style="color: var(--text-secondary);">Fuel Type:</span>
+                            <span style="font-weight: 500;">@v.FuelType</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.85rem;">
+                            <span style="color: var(--text-secondary);">Services:</span>
+                            <span style="font-weight: 500;" class="count-badge blue">@v.Services.Count</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+        @if (!Model.Vehicles.Any())
+        {
+            <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; background: var(--bg-card); border-radius: 12px; color: var(--text-secondary); border: 1px dashed var(--border);">
+                <span class="material-symbols-outlined" style="font-size: 48px; color: var(--text-muted); margin-bottom: 1rem; display: block;">directions_car</span>
+                <p style="margin: 0; font-size: 1rem; font-weight: 500;">No vehicles registered for this customer.</p>
+            </div>
+        }
+    </div>
+</div>
+
+<div id="history-tab" class="tab-content-panel" style="display: none;">
+    <div class="card" style="padding: 1.5rem; overflow-x: auto;">
+        <h2 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem;">Service History</h2>
+        
+        <table class="records-table" style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="border-bottom: 1px solid var(--border); text-align: left;">
+                    <th style="padding: 0.75rem 0.5rem; font-size: 0.8rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">Date</th>
+                    <th style="padding: 0.75rem 0.5rem; font-size: 0.8rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">Vehicle</th>
+                    <th style="padding: 0.75rem 0.5rem; font-size: 0.8rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">Service Type</th>
+                    <th style="padding: 0.75rem 0.5rem; font-size: 0.8rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">Description</th>
+                    <th style="padding: 0.75rem 0.5rem; font-size: 0.8rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">Cost</th>
+                    <th style="padding: 0.75rem 0.5rem; font-size: 0.8rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    var allServices = Model.Vehicles.SelectMany(v => v.Services.Select(s => new { Service = s, Vehicle = v })).OrderByDescending(x => x.Service.Date).ToList();
+                }
+                @foreach (var item in allServices)
+                {
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 1rem 0.5rem; font-size: 0.9rem;">@item.Service.Date.ToString("yyyy-MM-dd")</td>
+                        <td style="padding: 1rem 0.5rem; font-size: 0.9rem;">
+                            <strong>@item.Vehicle.Make @item.Vehicle.Model</strong>
+                            <div style="font-size: 0.75rem; color: var(--text-secondary); font-family: monospace;">@item.Vehicle.LicensePlate</div>
+                        </td>
+                        <td style="padding: 1rem 0.5rem; font-size: 0.9rem;"><span class="badge" style="background: #f3f4f6; color: #1f2937; padding: 0.25rem 0.5rem; border-radius: 4px; font-weight: 500;">@item.Service.ServiceType</span></td>
+                        <td style="padding: 1rem 0.5rem; font-size: 0.9rem; max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="@item.Service.Description">@item.Service.Description</td>
+                        <td style="padding: 1rem 0.5rem; font-size: 0.9rem; font-weight: 600;">Rs. @item.Service.Cost</td>
+                        <td style="padding: 1rem 0.5rem; font-size: 0.9rem;">
+                            <span class="status-badge @(item.Service.Status.ToLower())" style="padding: 0.25rem 0.5rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600; text-transform: capitalize;">
+                                @item.Service.Status
+                            </span>
+                        </td>
+                    </tr>
+                }
+                @if (!allServices.Any())
+                {
+                    <tr>
+                        <td colspan="6" style="text-align: center; padding: 3rem; color: var(--text-secondary);">
+                            <span class="material-symbols-outlined" style="font-size: 48px; color: var(--text-muted); margin-bottom: 1rem; display: block;">build</span>
+                            No service history found for this customer.
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    function switchTab(tabName, element) {
+        // Hide all panels
+        document.querySelectorAll('.tab-content-panel').forEach(panel => {
+            panel.style.display = 'none';
+        });
+        
+        // Show active panel
+        document.getElementById(tabName + '-tab').style.display = 'block';
+        
+        // Deactivate all pills
+        document.querySelectorAll('.filter-pills .pill').forEach(pill => {
+            pill.classList.remove('active');
+        });
+        
+        // Activate clicked pill
+        element.classList.add('active');
+    }
+</script>
+}

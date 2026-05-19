@@ -1,0 +1,364 @@
+@model AutoCarePro.Models.UserProfile
+@{
+    ViewData["Title"] = "Profile Management";
+    ViewData["ActivePage"] = "Profile";
+    var activeTab = ViewBag.ActiveTab as string ?? "profile";
+}
+
+<div class="page-header" style="margin-bottom: 24px;">
+    <h1 class="page-title" style="margin: 0; font-size: 24px; font-weight: 700;">Profile Management</h1>
+    <p class="page-subtitle" style="margin: 4px 0 0 0; color: #6b7280; font-size: 14px;">Manage your account details, security and preferences</p>
+</div>
+
+@if (TempData["Error"] != null)
+{
+    <div class="toast-notification" id="error-toast" style="background: #fff; color: #b91c1c; border-left: 4px solid #ef4444;">
+        <span class="material-symbols-outlined" style="color: #ef4444;">error</span>
+        @TempData["Error"]
+    </div>
+}
+
+<!-- Tabs Navigation -->
+<div class="tabs-nav" style="display: flex; gap: 8px; margin-bottom: 24px; background: #f3f4f6; padding: 4px; border-radius: 8px; width: fit-content;">
+    <a href="?tab=profile" style="padding: 8px 16px; border-radius: 6px; text-decoration: none; font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 8px; background: @(activeTab == "profile" ? "white" : "transparent"); color: @(activeTab == "profile" ? "#111827" : "#6b7280"); box-shadow: @(activeTab == "profile" ? "0 1px 2px rgba(0,0,0,0.05)" : "none");">
+        <span class="material-symbols-outlined" style="font-size: 18px;">person</span>
+        Profile
+    </a>
+    <a href="?tab=edit" style="padding: 8px 16px; border-radius: 6px; text-decoration: none; font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 8px; background: @(activeTab == "edit" ? "white" : "transparent"); color: @(activeTab == "edit" ? "#111827" : "#6b7280"); box-shadow: @(activeTab == "edit" ? "0 1px 2px rgba(0,0,0,0.05)" : "none");">
+        <span class="material-symbols-outlined" style="font-size: 18px;">edit</span>
+        Edit Profile
+    </a>
+    <a href="?tab=security" style="padding: 8px 16px; border-radius: 6px; text-decoration: none; font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 8px; background: @(activeTab == "security" ? "white" : "transparent"); color: @(activeTab == "security" ? "#111827" : "#6b7280"); box-shadow: @(activeTab == "security" ? "0 1px 2px rgba(0,0,0,0.05)" : "none");">
+        <span class="material-symbols-outlined" style="font-size: 18px;">security</span>
+        Security
+    </a>
+    <a href="?tab=notifications" style="padding: 8px 16px; border-radius: 6px; text-decoration: none; font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 8px; background: @(activeTab == "notifications" ? "white" : "transparent"); color: @(activeTab == "notifications" ? "#111827" : "#6b7280"); box-shadow: @(activeTab == "notifications" ? "0 1px 2px rgba(0,0,0,0.05)" : "none");">
+        <span class="material-symbols-outlined" style="font-size: 18px;">notifications</span>
+        Notifications
+    </a>
+    <a href="?tab=activitylog" style="padding: 8px 16px; border-radius: 6px; text-decoration: none; font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 8px; background: @(activeTab == "activitylog" ? "white" : "transparent"); color: @(activeTab == "activitylog" ? "#111827" : "#6b7280"); box-shadow: @(activeTab == "activitylog" ? "0 1px 2px rgba(0,0,0,0.05)" : "none");">
+        <span class="material-symbols-outlined" style="font-size: 18px;">history</span>
+        Activity Log
+    </a>
+</div>
+
+<!-- Tab Content -->
+<div class="tab-content">
+    @if (activeTab == "profile")
+    {
+        <div class="card" style="background: white; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); overflow: hidden;">
+            <div style="background: linear-gradient(135deg, #1e40af, #3b82f6); height: 140px; position: relative;">
+                <a href="?tab=edit" style="position: absolute; top: 16px; right: 16px; background: rgba(255,255,255,0.9); color: #111827; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 4px; cursor: pointer; text-decoration: none; box-shadow: 0 1px 2px rgba(0,0,0,0.1);">
+                    <span class="material-symbols-outlined" style="font-size: 16px;">edit</span>
+                    Edit Profile
+                </a>
+                <!-- Profile circle sits inside the banner -->
+                <div style="position: absolute; bottom: -40px; left: 24px; width: 88px; height: 88px; background: #111827; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 700; border: 4px solid white; box-shadow: 0 4px 8px rgba(0,0,0,0.15); z-index: 2;">
+                    @Model.Initials
+                </div>
+            </div>
+            <div style="padding: 0 24px 24px 24px;">
+                <!-- Name starts after the circle with enough left padding -->
+                <div style="padding-top: 12px; padding-left: 112px; min-height: 48px;">
+                    <h2 style="margin: 0; font-size: 22px; font-weight: 700; color: #111827;">@Model.FullName</h2>
+                    <p style="margin: 4px 0; color: #6b7280; font-size: 14px;">@Model.Role &middot; @Model.Department</p>
+                </div>
+                <div style="margin-top: 16px;">
+                    <p style="margin: 0 0 16px 0; color: #4b5563; font-size: 14px; line-height: 1.5;">@Model.Bio</p>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; border-top: 1px solid #f3f4f6; padding-top: 20px; margin-top: 20px;">
+                        <div>
+                            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                                <div style="background: #f3f4f6; padding: 8px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                                    <span class="material-symbols-outlined" style="color: #4b5563; font-size: 18px;">mail</span>
+                                </div>
+                                <div>
+                                    <div style="font-size: 12px; color: #6b7280; text-transform: uppercase; font-weight: 600;">Email</div>
+                                    <div style="font-size: 14px; color: #111827; font-weight: 500;">@Model.Email</div>
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <div style="background: #f3f4f6; padding: 8px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                                    <span class="material-symbols-outlined" style="color: #4b5563; font-size: 18px;">apartment</span>
+                                </div>
+                                <div>
+                                    <div style="font-size: 12px; color: #6b7280; text-transform: uppercase; font-weight: 600;">Department</div>
+                                    <div style="font-size: 14px; color: #111827; font-weight: 500;">@Model.Department</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                                <div style="background: #f3f4f6; padding: 8px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                                    <span class="material-symbols-outlined" style="color: #4b5563; font-size: 18px;">call</span>
+                                </div>
+                                <div>
+                                    <div style="font-size: 12px; color: #6b7280; text-transform: uppercase; font-weight: 600;">Phone</div>
+                                    <div style="font-size: 14px; color: #111827; font-weight: 500;">@Model.Phone</div>
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <div style="background: #f3f4f6; padding: 8px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                                    <span class="material-symbols-outlined" style="color: #4b5563; font-size: 18px;">location_on</span>
+                                </div>
+                                <div>
+                                    <div style="font-size: 12px; color: #6b7280; text-transform: uppercase; font-weight: 600;">Location</div>
+                                    <div style="font-size: 14px; color: #111827; font-weight: 500;">@Model.Location</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else if (activeTab == "edit")
+    {
+        <div class="card" style="background: white; padding: 24px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+            <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 24px;">
+                <div style="background: #dbeafe; padding: 8px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                    <span class="material-symbols-outlined" style="color: #2563eb;">edit_document</span>
+                </div>
+                <div>
+                    <h2 style="margin: 0; font-size: 18px; font-weight: 600; color: #111827;">Edit Profile</h2>
+                    <p style="margin: 2px 0 0 0; color: #6b7280; font-size: 13px;">Update your personal and professional information</p>
+                </div>
+            </div>
+            
+            <form asp-action="UpdateProfile" method="post" class="form-card" style="padding: 0; box-shadow: none;">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Full Name</label>
+                        <input asp-for="FullName" class="form-control" placeholder="Enter your full name" />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email Address</label>
+                        <input asp-for="Email" type="email" class="form-control" placeholder="Enter your email address" />
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Phone Number</label>
+                        <input asp-for="Phone" class="form-control" placeholder="Enter your phone number" />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Location</label>
+                        <input asp-for="Location" class="form-control" placeholder="e.g. Kathmandu, Nepal" />
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Role / Job Title</label>
+                        <input asp-for="Role" class="form-control" placeholder="e.g. Operations Manager" />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Department</label>
+                        <input asp-for="Department" class="form-control" placeholder="e.g. Operations" />
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Bio</label>
+                    <textarea asp-for="Bio" class="form-control form-textarea" placeholder="Write a short bio about yourself"></textarea>
+                </div>
+                
+                <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px; border-top: 1px solid #e5e7eb; padding-top: 20px;">
+                    <a href="?tab=profile" class="btn-secondary">Cancel</a>
+                    <button type="submit" class="btn-primary" style="background: #2563eb; color: white;">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    }
+    else if (activeTab == "security")
+    {
+        <div class="card" style="background: white; padding: 24px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+            <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 24px;">
+                <div style="background: #fef3c7; padding: 8px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                    <span class="material-symbols-outlined" style="color: #d97706;">security</span>
+                </div>
+                <div>
+                    <h2 style="margin: 0; font-size: 18px; font-weight: 600; color: #111827;">Security Settings</h2>
+                    <p style="margin: 2px 0 0 0; color: #6b7280; font-size: 13px;">Update your password to keep your account secure</p>
+                </div>
+            </div>
+            
+            <form asp-action="UpdatePassword" method="post" style="display: flex; flex-direction: column; gap: 16px; max-width: 480px;">
+                <div class="form-group">
+                    <label class="form-label">Current Password</label>
+                    <input type="password" name="currentPassword" required class="form-control" placeholder="Enter current password" />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">New Password</label>
+                    <input type="password" name="newPassword" required minlength="6" class="form-control" placeholder="Minimum 6 characters" />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Confirm New Password</label>
+                    <input type="password" name="confirmPassword" required minlength="6" class="form-control" placeholder="Re-enter new password" />
+                </div>
+                <div style="margin-top: 8px;">
+                    <button type="submit" class="btn-primary" style="background: #2563eb; color: white;">Update Password</button>
+                </div>
+            </form>
+        </div>
+    }
+    else if (activeTab == "notifications")
+    {
+        <div class="card" style="background: white; padding: 24px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+            <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 24px;">
+                <div style="background: #d1fae5; padding: 8px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                    <span class="material-symbols-outlined" style="color: #059669;">notifications</span>
+                </div>
+                <div>
+                    <h2 style="margin: 0; font-size: 18px; font-weight: 600; color: #111827;">Notification Preferences</h2>
+                    <p style="margin: 2px 0 0 0; color: #6b7280; font-size: 13px;">Control what you get notified about</p>
+                </div>
+            </div>
+            
+            <form asp-action="SavePreferences" method="post" style="display: flex; flex-direction: column; gap: 16px;">
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 16px; border-bottom: 1px solid #f3f4f6;">
+                    <div>
+                        <div style="font-size: 15px; font-weight: 500; color: #111827;">New Customer Registration</div>
+                        <div style="font-size: 13px; color: #6b7280; margin-top: 4px;">Get notified when a new customer is registered</div>
+                    </div>
+                    <label class="switch" style="position: relative; display: inline-block; width: 48px; height: 26px;">
+                        <input type="checkbox" asp-for="NotifyNewCustomer" style="opacity: 0; width: 0; height: 0;">
+                        <span class="slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #e5e7eb; transition: .4s; border-radius: 26px;">
+                            <span class="slider-dot" style="position: absolute; height: 18px; width: 18px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%;"></span>
+                        </span>
+                    </label>
+                </div>
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 16px; border-bottom: 1px solid #f3f4f6;">
+                    <div>
+                        <div style="font-size: 15px; font-weight: 500; color: #111827;">New Vehicle Added</div>
+                        <div style="font-size: 13px; color: #6b7280; margin-top: 4px;">Alert when a vehicle is added to the system</div>
+                    </div>
+                    <label class="switch" style="position: relative; display: inline-block; width: 48px; height: 26px;">
+                        <input type="checkbox" asp-for="NotifyNewVehicle" style="opacity: 0; width: 0; height: 0;">
+                        <span class="slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #e5e7eb; transition: .4s; border-radius: 26px;">
+                            <span class="slider-dot" style="position: absolute; height: 18px; width: 18px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%;"></span>
+                        </span>
+                    </label>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 16px; border-bottom: 1px solid #f3f4f6;">
+                    <div>
+                        <div style="font-size: 15px; font-weight: 500; color: #111827;">Service Reminders</div>
+                        <div style="font-size: 13px; color: #6b7280; margin-top: 4px;">Notify when a vehicle service is due</div>
+                    </div>
+                    <label class="switch" style="position: relative; display: inline-block; width: 48px; height: 26px;">
+                        <input type="checkbox" asp-for="NotifyServiceReminder" style="opacity: 0; width: 0; height: 0;">
+                        <span class="slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #e5e7eb; transition: .4s; border-radius: 26px;">
+                            <span class="slider-dot" style="position: absolute; height: 18px; width: 18px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%;"></span>
+                        </span>
+                    </label>
+                </div>
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 16px; border-bottom: 1px solid #f3f4f6;">
+                    <div>
+                        <div style="font-size: 15px; font-weight: 500; color: #111827;">Record Updates</div>
+                        <div style="font-size: 13px; color: #6b7280; margin-top: 4px;">Notify on any customer record edits</div>
+                    </div>
+                    <label class="switch" style="position: relative; display: inline-block; width: 48px; height: 26px;">
+                        <input type="checkbox" asp-for="NotifyRecordUpdate" style="opacity: 0; width: 0; height: 0;">
+                        <span class="slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #e5e7eb; transition: .4s; border-radius: 26px;">
+                            <span class="slider-dot" style="position: absolute; height: 18px; width: 18px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%;"></span>
+                        </span>
+                    </label>
+                </div>
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 16px; border-bottom: 1px solid #f3f4f6;">
+                    <div>
+                        <div style="font-size: 15px; font-weight: 500; color: #111827;">Daily Summary Report</div>
+                        <div style="font-size: 13px; color: #6b7280; margin-top: 4px;">Receive daily activity digest at end of day</div>
+                    </div>
+                    <label class="switch" style="position: relative; display: inline-block; width: 48px; height: 26px;">
+                        <input type="checkbox" asp-for="NotifyDailySummary" style="opacity: 0; width: 0; height: 0;">
+                        <span class="slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #e5e7eb; transition: .4s; border-radius: 26px;">
+                            <span class="slider-dot" style="position: absolute; height: 18px; width: 18px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%;"></span>
+                        </span>
+                    </label>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 16px; border-bottom: 1px solid #f3f4f6;">
+                    <div>
+                        <div style="font-size: 15px; font-weight: 500; color: #111827;">System Alerts</div>
+                        <div style="font-size: 13px; color: #6b7280; margin-top: 4px;">Critical system errors and warnings</div>
+                    </div>
+                    <label class="switch" style="position: relative; display: inline-block; width: 48px; height: 26px;">
+                        <input type="checkbox" asp-for="NotifySystemAlerts" style="opacity: 0; width: 0; height: 0;">
+                        <span class="slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #e5e7eb; transition: .4s; border-radius: 26px;">
+                            <span class="slider-dot" style="position: absolute; height: 18px; width: 18px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%;"></span>
+                        </span>
+                    </label>
+                </div>
+
+                <style>
+                    input:checked + .slider { background-color: #2563eb !important; }
+                    input:checked + .slider .slider-dot { transform: translateX(22px); }
+                </style>
+                
+                <div style="margin-top: 8px;">
+                    <button type="submit" class="btn-primary" style="background: #2563eb; color: white;">Save Preferences</button>
+                </div>
+            </form>
+        </div>
+    }
+    else if (activeTab == "activitylog")
+    {
+        var activityLogs = ViewBag.ActivityLogs as List<AutoCarePro.Models.ActivityLog>;
+        <div class="card" style="background: white; padding: 24px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                <div style="display: flex; gap: 12px; align-items: center;">
+                    <div style="background: #f3f4f6; padding: 8px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                        <span class="material-symbols-outlined" style="color: #6b7280;">history</span>
+                    </div>
+                    <div>
+                        <h2 style="margin: 0; font-size: 18px; font-weight: 600; color: #111827;">Recent Activity</h2>
+                        <p style="margin: 2px 0 0 0; color: #6b7280; font-size: 13px;">Your recent actions across the system</p>
+                    </div>
+                </div>
+                <span style="background: #f3f4f6; color: #4b5563; font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 20px;">@(activityLogs?.Count ?? 0) entries</span>
+            </div>
+            
+            <div style="display: flex; flex-direction: column; gap: 0;">
+                @if (activityLogs != null && activityLogs.Any())
+                {
+                    @foreach (var log in activityLogs)
+                    {
+                        var timeAgo = "";
+                        var diff = DateTime.Now - log.Timestamp;
+                        if (diff.TotalMinutes < 1) timeAgo = "Just now";
+                        else if (diff.TotalMinutes < 60) timeAgo = $"{(int)diff.TotalMinutes}m ago";
+                        else if (diff.TotalHours < 24) timeAgo = $"{(int)diff.TotalHours}h ago";
+                        else if (diff.TotalDays < 2) timeAgo = "Yesterday";
+                        else timeAgo = $"{(int)diff.TotalDays}d ago";
+
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid #f3f4f6;">
+                            <div style="display: flex; gap: 16px; align-items: center;">
+                                <div style="background: @log.IconBg; padding: 10px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                    <span class="material-symbols-outlined" style="color: @log.IconColor; font-size: 20px;">@log.Icon</span>
+                                </div>
+                                <div>
+                                    <div style="font-size: 15px; font-weight: 500; color: #111827;">@log.Action</div>
+                                    <div style="font-size: 13px; color: #6b7280; margin-top: 2px;">@log.Description</div>
+                                </div>
+                            </div>
+                            <div style="font-size: 12px; font-weight: 500; color: #9ca3af; white-space: nowrap; margin-left: 16px;">@timeAgo</div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div style="text-align: center; padding: 40px 0; color: #9ca3af;">
+                        <span class="material-symbols-outlined" style="font-size: 48px; display: block; margin-bottom: 8px;">history</span>
+                        <p style="font-size: 14px;">No activity yet. Actions you perform will appear here.</p>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
