@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Staff & Sales Management System</title>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Link to Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar" id="app-sidebar" style="display: none;">
+            <div class="brand">
+                <div class="brand-icon">
+                    <i data-lucide="wrench" style="color: white; width: 22px; height: 22px;"></i>
+                </div>
+                <div>
+                    <h1 class="brand-title" style="font-size: 1.1rem; line-height: 1.2;">Nisha Cars Transformers</h1>
+                    <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 500;">Staff Portal</span>
+                </div>
+            </div>
+            
+            <nav style="flex-grow: 1; margin-top: 10px;">
+                <ul class="nav-menu">
+                    <li class="nav-item active" data-tab="dashboard">
+                        <a href="#"><i data-lucide="layout-dashboard"></i>Dashboard</a>
+                    </li>
+                    <li class="nav-item" data-tab="customers">
+                        <a href="#"><i data-lucide="users"></i>Customers</a>
+                    </li>
+                    <li class="nav-item" data-tab="vehicles">
+                        <a href="#"><i data-lucide="car"></i>Vehicles</a>
+                    </li>
+                    <li class="nav-item" data-tab="billing">
+                        <a href="#"><i data-lucide="shopping-cart"></i>Billing & Sales</a>
+                    </li>
+                    <li class="nav-item" data-tab="invoices">
+                        <a href="#"><i data-lucide="receipt"></i>Invoices Registry</a>
+                    </li>
+                    <li class="nav-item" data-tab="credits">
+                        <a href="#"><i data-lucide="wallet"></i>Credit Manager</a>
+                    </li>
+                    <li class="nav-item" data-tab="admin-panel" id="nav-admin-panel" style="display: none; border-top: 1px dashed rgba(255,255,255,0.05); margin-top: 5px; padding-top: 5px;">
+                        <a href="#" style="color: var(--accent);"><i data-lucide="shield-check"></i>Director Hub</a>
+                    </li>
+                </ul>
+            </nav>
+            
+            <!-- User Profile & Logout -->
+            <div style="border-top: 1px solid var(--border-color); padding-top: 20px; display: flex; flex-direction: column; gap: 15px;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); display: flex; align-items: center; justify-content: center; font-family: var(--font-heading); font-weight: 700;" id="user-avatar">
+                        ST
+                    </div>
+                    <div>
+                        <div style="font-weight: 600; font-size: 0.95rem; color: white;" id="user-fullname">Staff Member</div>
+                        <div style="font-size: 0.8rem; color: var(--text-muted);" id="user-role">Sales Officer</div>
+                    </div>
+                </div>
+                <button class="btn btn-secondary" id="btn-logout" style="width: 100%;">
+                    <i data-lucide="log-out" style="width: 16px; height: 16px;"></i> Log Out
+                </button>
+            </div>
+        </aside>
+        
+        <!-- Main Content Area -->
+        <main style="flex-grow: 1; padding: 40px; overflow-y: auto; height: 100vh;">
+            
+            <!-- Login View -->
+            <section id="view-login" class="animate-fade-in" style="max-width: 450px; margin: 80px auto;">
+                <div class="glass-card" style="padding: 40px;">
+                    <div style="text-align: center; margin-bottom: 30px;">
+                        <div class="brand-icon" style="width: 60px; height: 60px; margin: 0 auto 15px auto;">
+                            <i data-lucide="shield-check" style="color: white; width: 32px; height: 32px;"></i>
+                        </div>
+                        <h2>Welcome back</h2>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 8px;">Login to access the Staff & Sales portal</p>
+                    </div>
+                    
+                    <form id="form-login">
+                        <div class="form-group">
+                            <label class="form-label">Username</label>
+                            <input type="text" class="form-input" id="login-username" placeholder="Enter username" required value="admin">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 30px; position: relative;">
+                            <label class="form-label">Password</label>
+                            <div style="position: relative; display: flex; align-items: center; width: 100%;">
+                                <input type="password" class="form-input" id="login-password" placeholder="Enter password" required value="admin123" style="padding-right: 45px; width: 100%;">
+                                <button type="button" id="toggle-password" style="position: absolute; right: 15px; background: none; border: none; color: var(--text-secondary); cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; outline: none;">
+                                    <i data-lucide="eye" style="width: 18px; height: 18px;"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div id="login-error" style="color: var(--danger); font-size: 0.9rem; margin-bottom: 15px; display: none;"></div>
+                        
+                        <button type="submit" class="btn btn-primary" style="width: 100%; height: 50px;">
+                            Sign In
+                        </button>
+                    </form>
+                </div>
+            </section>
+            
+            <!-- Views Container (Hidden before login) -->
+            <div id="app-content" style="display: none;">
+                <!-- Content will load dynamically based on active tab -->
+                <div id="tab-content-area" class="animate-fade-in">
+                    <!-- Dynamic views will inject here -->
+                </div>
+            </div>
+            
+        </main>
+        
+    </div>
+    
+    <!-- Invoice Print Modal Overlay -->
+    <div id="invoice-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); z-index: 2000; justify-content: center; align-items: center; padding: 20px;">
+        <div class="glass-card" style="width: 100%; max-width: 800px; max-height: 90vh; overflow-y: auto; padding: 40px; background: rgba(18, 20, 29, 0.95); position: relative; border-color: rgba(255,255,255,0.15);" id="invoice-modal-content">
+            <!-- Dynamic printable invoice content injected here -->
+        </div>
+    </div>
+
+    <!-- Initialize Lucide Icons -->
+    <script>
+        lucide.createIcons();
+    </script>
+    
+    <!-- App Logic Script -->
+    <script src="app.js?v=13"></script>
+</body>
+</html>
