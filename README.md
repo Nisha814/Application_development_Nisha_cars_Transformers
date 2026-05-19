@@ -88,11 +88,25 @@ npm run dev
 
 ---
 
-## 👤 Default Admin Account
-```
-Email:    admin@vehicleparts.com
-Password: Admin123
-```
+## 👤 Default Credentials
+
+For first-time setup, the database automatically seeds an initial high-privilege Administrator account. You can log in immediately with:
+* **Email:** `admin@vehicleparts.com`
+* **Password:** `Admin123`
+
+---
+
+## 📧 How to Setup Gmail SMTP App Password (Mandatory for OTP)
+
+Since the system uses OTP verification, you must configure a Gmail App Password so the ASP.NET Core server can securely send transactional verification emails.
+
+### Steps to Generate an App Password:
+1. Go to your **[Google Account Security settings](https://myaccount.google.com/security)**.
+2. Ensure **2-Step Verification** is turned **ON** (Required by Google to generate App Passwords).
+3. Search for **"App passwords"** in the top search bar, or scroll to the bottom of the "2-Step Verification" settings and select "App passwords".
+4. Enter an app name (e.g. `VehicleParts API`) and click **Create**.
+5. Copy the generated **16-character app password** (e.g., `abcd efgh ijkl mnop`).
+6. Paste this 16-character code (without spaces) in `appsettings.json` and `appsettings.Development.json` under `EmailSettings.Password`!
 
 ---
 
