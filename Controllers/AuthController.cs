@@ -116,8 +116,8 @@ namespace VehicleParts.API.Controllers
                 return BadRequest(ApiResponse<object>.ErrorResponse("Invalid email or password"));
             }
 
-            // ABSOLUTE BYPASS: Main Admin account never needs verification
-            if (!user.IsVerified && user.Role != UserRole.Admin && user.Email.ToLower() != "admin@vehicleparts.com")
+            // Admins and Staff are created internally and do not need verification
+            if (!user.IsVerified && user.Role == UserRole.Customer && user.Email.ToLower() != "admin@vehicleparts.com")
             {
                 return BadRequest(ApiResponse<object>.ErrorResponse("Your account is not verified. Please check your email for the OTP."));
             }

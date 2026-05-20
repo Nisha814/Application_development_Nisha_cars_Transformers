@@ -16,5 +16,14 @@ namespace VehicleParts.API.Models
         public string? OtpCode { get; set; }
         public DateTime? OtpExpiry { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        // Navigation Properties
+        public ICollection<Vehicle> Vehicles { get; set; } = new List<Vehicle>();
+        public ICollection<SalesInvoice> SalesInvoices { get; set; } = new List<SalesInvoice>();
+        public ICollection<CustomerCredit> CustomerCredits { get; set; } = new List<CustomerCredit>();
+        public ICollection<Appointment> Appointments { get; set; } = new List<Appointment>();
+        public ICollection<Review> Reviews { get; set; } = new List<Review>();
+        public ICollection<PartRequest> PartRequests { get; set; } = new List<PartRequest>();
+        public ICollection<CustomerNotification> Notifications { get; set; } = new List<CustomerNotification>();
     }
 }

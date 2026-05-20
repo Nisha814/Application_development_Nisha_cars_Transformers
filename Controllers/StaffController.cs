@@ -33,7 +33,9 @@ namespace VehicleParts.API.Controllers
                     u.FullName,
                     u.Email,
                     u.PhoneNumber,
-                    u.CreatedAt
+                    u.CreatedAt,
+                    Role = u.Role.ToString(),
+                    u.IsActive
                 })
                 .ToListAsync();
 
@@ -51,7 +53,9 @@ namespace VehicleParts.API.Controllers
                     u.FullName,
                     u.Email,
                     u.PhoneNumber,
-                    u.CreatedAt
+                    u.CreatedAt,
+                    Role = u.Role.ToString(),
+                    u.IsActive
                 })
                 .FirstOrDefaultAsync();
 
@@ -84,7 +88,8 @@ namespace VehicleParts.API.Controllers
                 Email = dto.Email,
                 PhoneNumber = dto.PhoneNumber,
                 PasswordHash = passwordHash,
-                Role = UserRole.Staff
+                Role = UserRole.Staff,
+                IsVerified = true
             };
 
             _context.Users.Add(newStaff);

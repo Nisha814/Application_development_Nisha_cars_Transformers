@@ -9,6 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddScoped<VehicleParts.API.Services.IEmailService, VehicleParts.API.Services.EmailService>();
+builder.Services.AddScoped<VehicleParts.API.Services.IInventoryService, VehicleParts.API.Services.InventoryService>();
 
 builder.Services.Configure<Microsoft.AspNetCore.Mvc.ApiBehaviorOptions>(options =>
 {
@@ -82,6 +83,32 @@ using (var scope = app.Services.CreateScope())
         context.Users.Add(admin);
         context.SaveChanges();
     }
+
+    if (!context.Warehouses.Any())
+    {
+        context.Warehouses.Add(new VehicleParts.API.Models.Warehouse
+        {
+            Name = "Main Warehouse",
+            Location = "Building A, Ground Floor"
+        });
+        context.SaveChanges();
+    }
+
+    var partsWithoutInventory = context.Parts
+        .Where(p => !context.Inventories.Any(i => i.PartId == p.Id))
+        .ToList();
+
+    foreach (var part in partsWithoutInventory)
+    {
+        context.Inventories.Add(new VehicleParts.API.Models.Inventory
+        {
+            PartId = part.Id,
+            MinStockLevel = 10,
+            UnitCost = part.Price * 0.6m
+        });
+    }
+    if (partsWithoutInventory.Any())
+        context.SaveChanges();
 }
 
 app.Run();
