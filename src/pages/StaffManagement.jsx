@@ -70,10 +70,8 @@ const StaffManagement = () => {
     };
 
     const filteredStaff = staffList.filter(staff => 
-        staff.role === 'Staff' && (
-            (staff.fullName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-            (staff.email || '').toLowerCase().includes(searchTerm.toLowerCase())
-        )
+        (staff.fullName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (staff.email || '').toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     const handleInputChange = (e) => {

@@ -1,34 +1,40 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import DashboardLayout from '../components/DashboardLayout';
 
 const StaffDashboard = () => {
     const navigate = useNavigate();
-
-    const handleLogout = () => {
-        localStorage.clear();
-        navigate('/login');
-    };
+    const fullName = localStorage.getItem('fullName') || 'Staff Member';
 
     return (
-        <div className="auth-container" style={{ maxWidth: '800px' }}>
+        <DashboardLayout>
             <div className="management-header">
                 <div>
-                    <h2>Staff Dashboard</h2>
-                    <p className="subtitle" style={{ textAlign: 'left', margin: 0 }}>Manage inventory and orders</p>
+                    <h2 style={{ fontSize: '24px', fontWeight: '700' }}>Staff Dashboard</h2>
+                    <p style={{ color: 'var(--text-muted)', fontSize: '14px' }}>Welcome back, {fullName}! Manage sales and customers.</p>
                 </div>
-                <button onClick={() => navigate('/profile')} style={{ width: 'auto', padding: '10px 20px', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border)' }}>
-                    My Profile
-                </button>
             </div>
             
-            <div className="message success">Welcome, Staff Member</div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px', marginTop: '20px' }}>
+                <div className="activity-card" style={{ cursor: 'pointer', transition: 'transform 0.2s' }} onClick={() => navigate('/staff/billing')} onMouseOver={e => e.currentTarget.style.transform = 'translateY(-5px)'} onMouseOut={e => e.currentTarget.style.transform = 'translateY(0)'}>
+                    <div style={{ fontSize: '40px', marginBottom: '10px' }}>🛒</div>
+                    <h3 style={{ margin: '0 0 10px 0' }}>New Sale / POS</h3>
+                    <p style={{ color: 'var(--text-muted)', margin: 0, fontSize: '14px' }}>Create new invoices and process payments.</p>
+                </div>
 
-            <div className="auth-footer" style={{ marginTop: '40px' }}>
-                <button onClick={handleLogout} style={{ background: 'rgba(239, 68, 68, 0.2)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.4)' }}>
-                    Logout Securely
-                </button>
+                <div className="activity-card" style={{ cursor: 'pointer', transition: 'transform 0.2s' }} onClick={() => navigate('/admin/customers')} onMouseOver={e => e.currentTarget.style.transform = 'translateY(-5px)'} onMouseOut={e => e.currentTarget.style.transform = 'translateY(0)'}>
+                    <div style={{ fontSize: '40px', marginBottom: '10px' }}>🤝</div>
+                    <h3 style={{ margin: '0 0 10px 0' }}>Register Customer</h3>
+                    <p style={{ color: 'var(--text-muted)', margin: 0, fontSize: '14px' }}>Add new customers and register their vehicles.</p>
+                </div>
+
+                <div className="activity-card" style={{ cursor: 'pointer', transition: 'transform 0.2s' }} onClick={() => navigate('/staff/customer-history')} onMouseOver={e => e.currentTarget.style.transform = 'translateY(-5px)'} onMouseOut={e => e.currentTarget.style.transform = 'translateY(0)'}>
+                    <div style={{ fontSize: '40px', marginBottom: '10px' }}>📜</div>
+                    <h3 style={{ margin: '0 0 10px 0' }}>Customer History</h3>
+                    <p style={{ color: 'var(--text-muted)', margin: 0, fontSize: '14px' }}>Look up past purchases and outstanding credits.</p>
+                </div>
             </div>
-        </div>
+        </DashboardLayout>
     );
 };
 

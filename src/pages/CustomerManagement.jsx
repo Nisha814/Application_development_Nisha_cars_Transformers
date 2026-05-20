@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getStaff, toggleUserStatus } from '../services/api';
+import { getCustomers, toggleUserStatus, addVehicle } from '../services/api';
 import DashboardLayout from '../components/DashboardLayout';
 import toast from 'react-hot-toast';
 
@@ -7,6 +7,15 @@ const CustomerManagement = () => {
     const [customerList, setCustomerList] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
+    const [showVehicleModal, setShowVehicleModal] = useState(false);
+    const [selectedCustomerId, setSelectedCustomerId] = useState(null);
+    const [vehicleLoading, setVehicleLoading] = useState(false);
+    const [vehicleForm, setVehicleForm] = useState({
+        make: '',
+        model: '',
+        year: new Date().getFullYear(),
+        licensePlate: ''
+    });
     
     useEffect(() => {
         fetchCustomers();
@@ -14,11 +23,8 @@ const CustomerManagement = () => {
 
     const fetchCustomers = async () => {
         try {
-            // We use the same getStaff endpoint but filter for Customers on the frontend
-            // In a larger app, you'd have a dedicated /api/customers endpoint
-            const response = await getStaff();
-            const customers = response.data.filter(u => u.role === 'Customer');
-            setCustomerList(customers);
+            const response = await getCustomers();
+            setCustomerList(response.data);
             setLoading(false);
         } catch (error) {
             toast.error("Failed to load customer data");
@@ -38,6 +44,26 @@ const CustomerManagement = () => {
             fetchCustomers();
         } catch (error) {
             toast.error("Failed to update status");
+        }
+    };
+
+    const handleAddVehicleClick = (customerId) => {
+        setSelectedCustomerId(customerId);
+        setVehicleForm({ make: '', model: '', year: new Date().getFullYear(), licensePlate: '' });
+        setShowVehicleModal(true);
+    };
+
+    const handleVehicleSubmit = async (e) => {
+        e.preventDefault();
+        setVehicleLoading(true);
+        try {
+            await addVehicle({ ...vehicleForm, customerId: selectedCustomerId });
+            toast.success("Vehicle registered successfully");
+            setShowVehicleModal(false);
+        } catch (error) {
+            toast.error(error.message || "Failed to register vehicle");
+        } finally {
+            setVehicleLoading(false);
         }
     };
 
@@ -70,6 +96,7 @@ const CustomerManagement = () => {
                             <th style={{ padding: '16px', textAlign: 'left' }}>Email</th>
                             <th style={{ padding: '16px', textAlign: 'left' }}>Verified</th>
                             <th style={{ padding: '16px', textAlign: 'left' }}>Status</th>
+                            <th style={{ padding: '16px', textAlign: 'right' }}>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -118,6 +145,15 @@ const CustomerManagement = () => {
                                         </button>
                                     </div>
                                 </td>
+                                <td style={{ padding: '16px', textAlign: 'right' }}>
+                                    <button 
+                                        className="auth-button" 
+                                        style={{ width: 'auto', padding: '6px 12px', fontSize: '13px' }}
+                                        onClick={() => handleAddVehicleClick(customer.id)}
+                                    >
+                                        + Add Vehicle
+                                    </button>
+                                </td>
                             </tr>
                         )) : (
                             <tr>
@@ -129,6 +165,61 @@ const CustomerManagement = () => {
                     </tbody>
                 </table>
             </div>
+
+            {showVehicleModal && (
+                <div className="modal-overlay">
+                    <div className="auth-card" style={{ width: '100%', maxWidth: '400px' }}>
+                        <div className="auth-header">
+                            <h2>Register Vehicle</h2>
+                            <p className="subtitle">Add a vehicle to this customer's account</p>
+                        </div>
+                        <form onSubmit={handleVehicleSubmit}>
+                            <div className="form-group">
+                                <label>Make</label>
+                                <input 
+                                    value={vehicleForm.make} 
+                                    onChange={(e) => setVehicleForm({...vehicleForm, make: e.target.value})} 
+                                    placeholder="e.g. Toyota" 
+                                    required 
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label>Model</label>
+                                <input 
+                                    value={vehicleForm.model} 
+                                    onChange={(e) => setVehicleForm({...vehicleForm, model: e.target.value})} 
+                                    placeholder="e.g. Corolla" 
+                                    required 
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label>Year</label>
+                                <input 
+                                    type="number"
+                                    value={vehicleForm.year} 
+                                    onChange={(e) => setVehicleForm({...vehicleForm, year: parseInt(e.target.value)})} 
+                                    required 
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label>License Plate</label>
+                                <input 
+                                    value={vehicleForm.licensePlate} 
+                                    onChange={(e) => setVehicleForm({...vehicleForm, licensePlate: e.target.value})} 
+                                    placeholder="e.g. BA-PA-1234" 
+                                    required 
+                                />
+                            </div>
+                            <button type="submit" className="auth-button" disabled={vehicleLoading}>
+                                {vehicleLoading ? 'Saving...' : 'Register Vehicle'}
+                            </button>
+                            <button type="button" className="auth-button" onClick={() => setShowVehicleModal(false)} style={{ background: 'transparent', color: 'var(--text-muted)', border: 'none', boxShadow: 'none', marginTop: '8px' }}>
+                                Cancel
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            )}
         </DashboardLayout>
     );
 };

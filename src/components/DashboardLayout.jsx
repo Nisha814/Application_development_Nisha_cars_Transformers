@@ -16,27 +16,66 @@ const DashboardLayout = ({ children }) => {
         navigate('/login');
     };
 
-    const navItems = [
-        { name: 'Dashboard', path: '/admin-dashboard', icon: '📊' },
-        { name: 'Staff', path: '/admin/staff', icon: '👥' },
-        { name: 'Customers', path: '/admin/customers', icon: '🤝' },
-        { name: 'Vendors', path: '/admin/vendors', icon: '🏢' },
-        { name: 'Profile', path: '/profile', icon: '👤' },
+    const role = localStorage.getItem('role') || 'Admin';
+
+    let navItems = [];
+    const inventoryNav = [
+        { name: 'Inventory', path: '/inventory', icon: '📦' },
+        { name: 'Stock Tracking', path: '/inventory/tracking', icon: '📥' },
+        { name: 'Stock Logs', path: '/inventory/logs', icon: '📋' },
+        { name: 'Stock Alerts', path: '/inventory/alerts', icon: '⚠️' },
     ];
+
+    if (role === 'Admin') {
+        navItems = [
+            { name: 'Dashboard', path: '/admin-dashboard', icon: '📊' },
+            { name: 'Analytics', path: '/admin/analytics', icon: '📈' },
+            { name: 'Reports', path: '/admin/reports', icon: '📋' },
+            { name: 'Predictions', path: '/admin/predictions', icon: '🤖' },
+            ...inventoryNav,
+            { name: 'Staff', path: '/admin/staff', icon: '👥' },
+            { name: 'Customers', path: '/admin/customers', icon: '🤝' },
+            { name: 'Vendors', path: '/admin/vendors', icon: '🏢' },
+            { name: 'Billing / POS', path: '/staff/billing', icon: '🛒' },
+            { name: 'Profile', path: '/profile', icon: '👤' },
+        ];
+    } else if (role === 'Staff') {
+        navItems = [
+            { name: 'Dashboard', path: '/staff-dashboard', icon: '📊' },
+            ...inventoryNav,
+            { name: 'Billing / POS', path: '/staff/billing', icon: '🛒' },
+            { name: 'Customers', path: '/admin/customers', icon: '🤝' },
+            { name: 'Customer History', path: '/staff/customer-history', icon: '📜' },
+            { name: 'Profile', path: '/profile', icon: '👤' },
+        ];
+    } else {
+        navItems = [
+            { name: 'Dashboard', path: '/customer-dashboard', icon: '📊' },
+            { name: 'Appointments', path: '/customer/appointments', icon: '📅' },
+            { name: 'Part Requests', path: '/customer/requests', icon: '🔧' },
+            { name: 'Reviews', path: '/customer/reviews', icon: '⭐' },
+            { name: 'Service History', path: '/customer/service-history', icon: '📜' },
+            { name: 'Purchases', path: '/customer/purchases', icon: '🛒' },
+            { name: 'Payments', path: '/customer/payments', icon: '💳' },
+            { name: 'Service Center', path: '/customer/service-center', icon: '🏢' },
+            { name: 'Notifications', path: '/customer/notifications', icon: '🔔' },
+            { name: 'Profile', path: '/profile', icon: '👤' },
+        ];
+    }
 
     return (
         <div className="dashboard-layout">
             <aside className="sidebar">
                 <div className="sidebar-logo">
                     <span style={{ background: 'var(--primary)', color: 'white', padding: '4px 8px', borderRadius: '6px' }}>VP</span>
-                    AdminCore
+                    AutoCare Pro
                 </div>
 
                 <nav className="nav-menu">
                     {navItems.map((item) => (
                         <div 
                             key={item.path}
-                            className={`nav-item ${location.pathname === item.path ? 'active' : ''}`}
+                            className={`nav-item ${location.pathname === item.path || (item.path !== '/customer-dashboard' && item.path !== '/inventory' && location.pathname.startsWith(item.path)) || (item.path === '/inventory' && location.pathname.startsWith('/inventory')) ? 'active' : ''}`}
                             onClick={() => navigate(item.path)}
                         >
                             <span>{item.icon}</span> {item.name}
